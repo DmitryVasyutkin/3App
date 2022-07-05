@@ -5,7 +5,7 @@ import io.mobidoo.domain.entities.wallpaper.Wallpaper
 data class SubCategoryResponse(
     val id: Long,
     val name: String,
-    val array: List<Wallpaper>,
+    val array: List<WallpaperItem>,
     val type: String,
     val categoryName: String
 )

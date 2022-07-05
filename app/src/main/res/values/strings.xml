@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">3App</string>
+    <string name="ringtones">ringtones</string>
+    <string name="collection">collection</string>
+    <string name="flashcalls">flashcalls</string>
+    <string name="live">live</string>
 </resources>

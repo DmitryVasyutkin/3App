@@ -25,10 +25,11 @@ ext{
     okhttp_logging_iterceptor_version = '3.12.1'
     retrofit_moshi_converter_version = '2.9.0'
     room_version = '2.4.2'
-    nav_version = '2.4.2'
+    nav_version = '2.5.0'
     retrofit_version = '2.9.0'
     interceptor_version = "4.9.0"
-    coroutines_version = '1.3.9'
+    coroutines_version = '1.6.3'
     dagger_version = "2.42"
+    lifecycle_version = "2.5.0"
 
 }
