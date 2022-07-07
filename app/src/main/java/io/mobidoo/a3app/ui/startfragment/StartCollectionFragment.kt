@@ -57,6 +57,11 @@ class StartCollectionFragment : Fragment() {
                 Log.i(TAG, "uiState $it")
             }
         }
+        lifecycleScope.launchWhenCreated {
+            viewModel.errorMessage.collect(){
+
+            }
+        }
     }
 
     override fun onResume() {

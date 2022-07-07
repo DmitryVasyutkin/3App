@@ -16,6 +16,7 @@ import io.mobidoo.domain.entities.wallpaper.SubCategory
 import io.mobidoo.domain.entities.wallpaper.Wallpaper
 import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 interface ApiService {
 
@@ -25,7 +26,8 @@ interface ApiService {
 
     suspend fun getFlashCalls() : Response<FlashCallResponse>
 
-    suspend fun getWallpapers(id: Long) : Response<WallpapersResponse>
+    @GET("/api/wallpapers/static2/{id}")
+    suspend fun getWallpapers(@Path("id") id: Long) : Response<WallpapersResponse>
 
     suspend fun getSubcategories(id: Long) : Response<SubCategoryListResponse>
 
