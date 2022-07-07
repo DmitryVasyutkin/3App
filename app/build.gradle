@@ -14,7 +14,7 @@ android {
         versionCode rootProject.ext.version_code
         versionName rootProject.ext.version_name
 
-        buildConfigField "String","BASE_URL","\"http://143.110.147.139/\""
+        buildConfigField "String","BASE_URL","\"http://188.166.114.39\""
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -73,4 +73,7 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     implementation "com.squareup.okhttp3:logging-interceptor:$interceptor_version"
+
+    //shimmer
+    implementation 'com.facebook.shimmer:shimmer:0.5.0'
 }

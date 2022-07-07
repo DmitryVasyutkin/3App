@@ -1,11 +1,12 @@
 package io.mobidoo.data.entities.wallpaper
 
+import com.google.gson.annotations.SerializedName
 import io.mobidoo.domain.entities.wallpaper.Wallpaper
 
 data class SubCategoryResponse(
-    val id: Long,
     val name: String,
     val array: List<WallpaperItem>,
-    val type: String,
-    val categoryName: String
+    @SerializedName("link")
+    val wallpapersLink: String,
+    val type: String
 )

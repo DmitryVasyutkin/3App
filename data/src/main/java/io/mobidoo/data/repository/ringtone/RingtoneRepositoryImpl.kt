@@ -20,8 +20,8 @@ class RingtoneRepositoryImpl(
         }
     }
 
-    override suspend fun getRingtones(id: Long): ResultData<List<Ringtone>> {
-        return transformResult(ringtoneRemoteDataSource.getRingtones(id).toResultData()){
+    override suspend fun getRingtones(link: String): ResultData<List<Ringtone>> {
+        return transformResult(ringtoneRemoteDataSource.getRingtones(link).toResultData()){
             mapper.toRingtoneList(it)
         }
     }

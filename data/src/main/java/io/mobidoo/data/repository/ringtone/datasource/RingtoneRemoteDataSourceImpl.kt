@@ -13,7 +13,7 @@ class RingtoneRemoteDataSourceImpl(
         return apiService.getRingtoneCategories()
     }
 
-    override suspend fun getRingtones(id: Long): Response<RingtonesResponse> {
-        return apiService.getRingtones(id)
+    override suspend fun getRingtones(link: String): Response<RingtonesResponse> {
+        return apiService.getRingtones(link)
     }
 }

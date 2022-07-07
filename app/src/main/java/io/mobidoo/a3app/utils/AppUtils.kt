@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import io.mobidoo.a3app.BuildConfig
 
 object AppUtils {
 
@@ -34,4 +35,6 @@ object AppUtils {
         return false
 
     }
+
+    fun createFullLink(link: String) = StringBuilder().append(BuildConfig.BASE_URL).append(link).toString()
 }

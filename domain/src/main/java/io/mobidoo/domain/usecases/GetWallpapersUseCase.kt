@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.callbackFlow
 class GetWallpapersUseCase(
     private val wallpaperRepository: WallpaperRepository
 ) {
-    suspend operator fun invoke(id: Long) = wallpaperRepository.getWallpapers(id)
+    suspend operator fun invoke(link: String) = wallpaperRepository.getWallpapers(link)
 }

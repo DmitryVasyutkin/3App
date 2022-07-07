@@ -1,8 +1,10 @@
 package io.mobidoo.domain.entities.wallpaper
 
+import io.mobidoo.domain.common.Constants
+
 data class Wallpaper(
     val url: String,
     val previewUrl: String,
-    val type: String
+    var type: String = Constants.TYPE_WALLPAPER
 )
 

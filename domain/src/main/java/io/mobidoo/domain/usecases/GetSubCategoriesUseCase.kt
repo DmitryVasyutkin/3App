@@ -6,5 +6,5 @@ import kotlinx.coroutines.flow.callbackFlow
 class GetSubCategoriesUseCase(
     private val wallpaperRepository: WallpaperRepository
 ) {
-    suspend operator fun invoke(id: Long) = wallpaperRepository.getSubcategories(id)
+    suspend operator fun invoke(link: String) = wallpaperRepository.getSubcategories(link)
 }

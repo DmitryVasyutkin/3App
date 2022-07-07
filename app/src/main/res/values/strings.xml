@@ -9,4 +9,13 @@
     <string name="live_">Live</string>
     <string name="new_">New</string>
     <string name="all_">All</string>
+    <string name="allRecomendation">All recommendation</string>
+    <string name="top100">TOP 100</string>
+    <string name="calm">Calm</string>
+    <string name="Abstract">Abstract</string>
+    <string name="flashTunes">FlashTunes</string>
+    <string name="boostYourMood">boost your mood</string>
+    <string name="share_flash">Share</string>
+    <string name="download_flash">Download</string>
+    <string name="liveCategories">Live Categories</string>
 </resources>

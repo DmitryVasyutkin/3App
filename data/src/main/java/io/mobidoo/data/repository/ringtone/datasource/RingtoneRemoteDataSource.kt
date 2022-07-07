@@ -11,5 +11,5 @@ import retrofit2.Response
 interface RingtoneRemoteDataSource {
 
     suspend fun getRingtoneCategories() : Response<RingtoneCategoryListResponse>
-    suspend fun getRingtones(id: Long) : Response<RingtonesResponse>
+    suspend fun getRingtones(link: String) : Response<RingtonesResponse>
 }

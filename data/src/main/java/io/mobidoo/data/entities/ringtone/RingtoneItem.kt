@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class RingtoneItem(
     @SerializedName("url")
     val url: String,
-    @SerializedName("imageUrl")
+    @SerializedName("image")
     val imageUrl: String,
     @SerializedName("title")
     val title: String

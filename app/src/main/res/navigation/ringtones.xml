@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ringtones"
+    app:startDestination="@id/ringtoneFragment">
+
+    <fragment
+        android:id="@+id/ringtoneFragment"
+        android:name="io.mobidoo.a3app.ui.ringtone.RingtoneFragment"
+        android:label="RingtoneFragment" />
+</navigation>

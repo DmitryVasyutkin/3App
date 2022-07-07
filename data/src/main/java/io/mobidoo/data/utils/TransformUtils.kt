@@ -5,7 +5,7 @@ import retrofit2.Response
 
 object TransformUtils {
 
-    fun <T> Response<T>.toResultData() : ResultData<out T> {
+    fun <T> Response<T>.toResultData() : ResultData<T> {
         return when(this.code()){
             in 200..300 -> {
                 if (body() != null)

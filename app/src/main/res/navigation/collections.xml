@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/collections"
+    app:startDestination="@id/startCollectionFragment">
+
+    <fragment
+        android:id="@+id/startCollectionFragment"
+        android:name="io.mobidoo.a3app.ui.startfragment.StartCollectionFragment"
+        android:label="StartCollectionFragment" >
+        <action
+            android:id="@+id/action_startCollectionFragment_to_wallCategoriesFragment"
+            app:destination="@id/wallCategoriesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/wallCategoriesFragment"
+        android:name="io.mobidoo.a3app.ui.startfragment.WallCategoriesFragment"
+        android:label="WallCategoriesFragment" />
+</navigation>

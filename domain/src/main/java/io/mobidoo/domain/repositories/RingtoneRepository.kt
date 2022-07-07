@@ -7,5 +7,5 @@ import io.mobidoo.domain.entities.wallpaper.Wallpaper
 
 interface RingtoneRepository {
     suspend fun getRingtoneCategories() : ResultData<List<RingtoneCategory>>
-    suspend fun getRingtones(id: Long) : ResultData<List<Ringtone>>
+    suspend fun getRingtones(link: String) : ResultData<List<Ringtone>>
 }

@@ -16,7 +16,7 @@ import io.mobidoo.a3app.viewmodels.MainActivityViewModel
 import io.mobidoo.a3app.viewmodels.MainActivityViewModelFactory
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
@@ -30,24 +30,6 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container) as NavHostFragment
         navController = navHostFragment.navController
         NavigationUI.setupWithNavController(binding.bottomNavView, navController)
-
     }
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.startCollectionFragment -> {
-
-            }
-            R.id.flashCallFragment -> {
-
-            }
-            R.id.liveWallpaperFragment -> {
-
-            }
-            R.id.ringtoneFragment -> {
-
-            }
-        }
-        return false
-    }
 }

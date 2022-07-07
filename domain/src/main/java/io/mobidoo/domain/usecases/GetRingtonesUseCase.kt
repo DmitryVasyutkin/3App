@@ -7,5 +7,5 @@ import kotlinx.coroutines.flow.callbackFlow
 class GetRingtonesUseCase(
     private val ringtoneRepository: RingtoneRepository
 ) {
-    suspend operator fun invoke(id: Long) = ringtoneRepository.getRingtones(id)
+    suspend operator fun invoke(link: String) = ringtoneRepository.getRingtones(link)
 }

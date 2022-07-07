@@ -5,7 +5,6 @@ import io.mobidoo.data.repository.wallpaper.datasource.WallpapersRemoteDataSourc
 import io.mobidoo.data.utils.TransformUtils.toResultData
 import io.mobidoo.data.utils.TransformUtils.transformResult
 import io.mobidoo.domain.common.ResultData
-import io.mobidoo.domain.entities.FlashCall
 import io.mobidoo.domain.entities.StartCollection
 import io.mobidoo.domain.entities.wallpaper.SubCategory
 import io.mobidoo.domain.entities.wallpaper.Wallpaper
@@ -19,38 +18,21 @@ class WallpaperRepositoryImpl(
 ) : WallpaperRepository{
 
     override suspend fun getStartCollection(): ResultData<StartCollection> {
-//        return transformResult(wallpapersRemoteDataSource.getStartCollection().toResultData()) {
-//            wallpaperMapper.toStartCollection(it)
-//        }
-        delay(2000)
-        return transformResult(wallpapersRemoteDataSource.getTmpStart().toResultData()) {
-            wallpaperMapper.toStartCollection(it)
+        return transformResult(wallpapersRemoteDataSource.getStartCollection().toResultData()){
+            wallpaperMapper.transformStartCollection(it)
         }
     }
 
-    override suspend fun getLiveCategories(): ResultData<List<SubCategory>> {
-        return transformResult(wallpapersRemoteDataSource.getLiveCategories().toResultData()){
-            wallpaperMapper.toSubCategoryList(it)
+    override suspend fun getSubcategories(link: String): ResultData<List<SubCategory>> {
+        return transformResult(wallpapersRemoteDataSource.getSubcategories(link).toResultData()){
+            wallpaperMapper.transformSubCategoriesList(it)
         }
     }
 
-    override suspend fun getFlashCalls(): ResultData<List<FlashCall>> {
-        return transformResult(wallpapersRemoteDataSource.getFlashCalls().toResultData()){
-            wallpaperMapper.toFlashCallList(it)
+    override suspend fun getWallpapers(link: String): ResultData<List<Wallpaper>> {
+        return transformResult(wallpapersRemoteDataSource.getWallpapers(link).toResultData()){
+            wallpaperMapper.transformWallpapersList(it)
         }
     }
-
-    override suspend fun getSubcategories(id: Long): ResultData<List<SubCategory>> {
-        return transformResult(wallpapersRemoteDataSource.getSubcategories(id).toResultData()){
-            wallpaperMapper.toSubCategoryList(it)
-        }
-    }
-
-    override suspend fun getWallpapers(id: Long): ResultData<List<Wallpaper>> {
-        return transformResult(wallpapersRemoteDataSource.getWallpapers(id).toResultData()){
-            wallpaperMapper.toWallpaperList(it)
-        }
-    }
-
 }
 

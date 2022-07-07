@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/ringtoneFragment"
+    <item android:id="@+id/ringtones"
         android:title="@string/ringtones"
         app:showAsAction="never"
         android:icon="@drawable/ic_bottom_view_ringtone_selector"/>
 
-    <item android:id="@+id/startCollectionFragment"
+    <item android:id="@+id/collections"
         android:title="@string/collection"
         app:showAsAction="never"
         android:icon="@drawable/ic_bottom_view_collection_selector"/>
 
-    <item android:id="@+id/flashCallFragment"
+    <item android:id="@+id/flashcalls"
         android:title="@string/flashcalls"
         app:showAsAction="never"
         android:icon="@drawable/ic_bottom_view_flashcall_selector"/>
 
-    <item android:id="@+id/liveWallpaperFragment"
+    <item android:id="@+id/live"
         android:title="@string/live"
         app:showAsAction="never"
         android:icon="@drawable/ic_bottom_view_livewall_selector"/>

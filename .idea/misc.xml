@@ -3,6 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/dr_download_flash.xml" value="0.224" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/dr_share_circle_transp.xml" value="0.224" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/dr_share_circle_transp_blue.xml" value="0.224" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/dr_share_flash.xml" value="0.224" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/drawable_flash_call_volume.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_arrow_forward.xml" value="0.2725" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_baseline_arrow_forward_24.xml" value="0.2725" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_bottom_view_collection.xml" value="0.264" />
@@ -25,8 +30,10 @@
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_live_wallpapers.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_ringtones.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_start_collection.xml" value="0.33" />
-        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/item_collection_flashcall.xml" value="0.3625" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_wallpaper_categories.xml" value="0.3625" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/item_collection_flashcall.xml" value="0.33" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/item_collection_wallpaper.xml" value="0.3625" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/shimmer_layout_collections_item.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/menu/nav_menu.xml" value="0.33" />
       </map>
     </option>

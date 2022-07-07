@@ -22,6 +22,6 @@ class RingtoneApiResponseMapper {
     }
 
     fun toRingtoneCategory(response: RingtoneCategoryResponse) : RingtoneCategory{
-        return RingtoneCategory(response.id, response.name, response.ringtones.map { it.toRingtone() })
+        return RingtoneCategory(id = response.id, link = response.link, name = response.name, ringtones = response.ringtones.map{it.toRingtone()} )
     }
 }
