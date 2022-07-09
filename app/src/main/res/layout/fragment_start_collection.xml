@@ -11,7 +11,8 @@
         android:layout_height="40dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@color/collectionBackground">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -49,7 +50,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="70dp">
+            android:paddingBottom="70dp"
+            android:background="@color/collectionBackground">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -94,7 +96,7 @@
                     android:layout_below="@+id/rl1"
                     app:shimmer_shape="linear"
                     app:shimmer_repeat_mode="restart"
-                    app:shimmer_duration="50">
+                    app:shimmer_duration="700">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -160,7 +162,7 @@
                     android:layout_height="wrap_content"
                     app:shimmer_shape="linear"
                     app:shimmer_repeat_mode="restart"
-                    app:shimmer_duration="50"
+                    app:shimmer_duration="700"
                     android:layout_below="@+id/rl2"
                     >
 
@@ -185,6 +187,7 @@
                     android:layout_below="@+id/rl2"/>
 
             </RelativeLayout>
+
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -228,7 +231,7 @@
                     android:layout_height="wrap_content"
                     app:shimmer_shape="linear"
                     app:shimmer_repeat_mode="restart"
-                    app:shimmer_duration="50"
+                    app:shimmer_duration="700"
                     android:layout_below="@+id/rl3">
 
                     <LinearLayout
@@ -251,6 +254,8 @@
                     android:layout_below="@+id/rl3"/>
 
             </RelativeLayout>
+
+            <include layout="@layout/layout_ad_collections"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -295,7 +300,7 @@
                     android:layout_height="wrap_content"
                     app:shimmer_shape="linear"
                     app:shimmer_repeat_mode="restart"
-                    app:shimmer_duration="50"
+                    app:shimmer_duration="700"
                     android:layout_below="@+id/rl4">
 
                     <LinearLayout
@@ -361,7 +366,7 @@
                     android:layout_height="wrap_content"
                     app:shimmer_shape="linear"
                     app:shimmer_repeat_mode="restart"
-                    app:shimmer_duration="50"
+                    app:shimmer_duration="700"
                     android:layout_below="@+id/rl5">
 
                     <LinearLayout
@@ -427,7 +432,7 @@
                     android:layout_height="wrap_content"
                     app:shimmer_shape="linear"
                     app:shimmer_repeat_mode="restart"
-                    app:shimmer_duration="50"
+                    app:shimmer_duration="700"
                     android:layout_below="@+id/rl6">
 
                     <LinearLayout
@@ -450,6 +455,8 @@
                     android:layout_below="@+id/rl6"/>
 
             </RelativeLayout>
+
+            <include layout="@layout/layout_ad_collections"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -493,7 +500,7 @@
                     android:layout_height="wrap_content"
                     app:shimmer_shape="linear"
                     app:shimmer_repeat_mode="restart"
-                    app:shimmer_duration="50"
+                    app:shimmer_duration="700"
                     android:layout_below="@+id/rl7">
 
                     <LinearLayout

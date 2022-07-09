@@ -15,5 +15,13 @@
     <fragment
         android:id="@+id/wallCategoriesFragment"
         android:name="io.mobidoo.a3app.ui.startfragment.WallCategoriesFragment"
-        android:label="WallCategoriesFragment" />
+        android:label="WallCategoriesFragment" >
+        <action
+            android:id="@+id/action_wallCategoriesFragment_to_selectedCategoryWallpapersFragment"
+            app:destination="@id/selectedCategoryWallpapersFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/selectedCategoryWallpapersFragment"
+        android:name="io.mobidoo.a3app.entity.startcollectionitem.SelectedCategoryWallpapersFragment"
+        android:label="SelectedCategoryWallpapersFragment" />
 </navigation>

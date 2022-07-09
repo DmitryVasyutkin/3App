@@ -4,6 +4,8 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.widget.RelativeLayout
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.mobidoo.a3app.BuildConfig
 
 object AppUtils {
@@ -37,4 +39,9 @@ object AppUtils {
     }
 
     fun createFullLink(link: String) = StringBuilder().append(BuildConfig.BASE_URL).append(link).toString()
+
+    fun BottomSheetBehavior<RelativeLayout>.expand() {
+        if(this.state == BottomSheetBehavior.STATE_COLLAPSED)
+            this.state = BottomSheetBehavior.STATE_EXPANDED
+    }
 }

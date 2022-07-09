@@ -25,6 +25,7 @@ import io.mobidoo.a3app.entity.uistate.allcollectionstate.AllCollectionsUIState
 import io.mobidoo.a3app.ui.MainActivity
 import io.mobidoo.a3app.viewmodels.MainActivityViewModel
 import io.mobidoo.a3app.viewmodels.MainActivityViewModelFactory
+import io.mobidoo.domain.common.Constants.WALLS_HEIGHT_TO_WIDTH_DIMENSION
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
@@ -35,8 +36,10 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
 
     companion object{
         const val TAG = "StartCollectionFragment"
+        const val ARG_NAME = "name"
+        const val ARG_LINK = "link"
         private const val widthScale = 0.35f
-        private const val heightToWidthScale = 2
+        private const val heightToWidthScale = WALLS_HEIGHT_TO_WIDTH_DIMENSION
     }
     @Inject
     lateinit var factory: MainActivityViewModelFactory
@@ -52,6 +55,8 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
     private lateinit var popularWallsAdapter: StartWallpaperCollectionsAdapter
     private lateinit var calmWallsAdapter: StartWallpaperCollectionsAdapter
     private lateinit var abstractWallsAdapter: StartWallpaperCollectionsAdapter
+
+    private var uiState: AllCollectionsUIState? = null
 
     private var uiUpdatesJob: Job? = null
 
@@ -75,9 +80,16 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
 
         initializeRecyclers()
         binding.btnSeeAllLive.setOnClickListener(this)
+        binding.btnSeeAllNew.setOnClickListener(this)
+        binding.btnSeeAllAbstract.setOnClickListener(this)
+        binding.btnSeeAllAll.setOnClickListener(this)
+        binding.btnSeeAllCalm.setOnClickListener(this)
+        binding.btnSeeAllPopular.setOnClickListener(this)
+        binding.btnSeeAllFlash.setOnClickListener(this)
         uiUpdatesJob = lifecycleScope.launchWhenResumed {
             viewModel.uiStateFlow.collect(){
                 Log.i(TAG, "uiState $it")
+                uiState = it
                 if (it.isLoading){
 //                    binding.shimmerFlash.startShimmer()
 //                    binding.shimmerLive.startShimmer()
@@ -188,14 +200,48 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
     override fun onClick(p0: View?) {
         when(p0){
             binding.btnSeeAllLive -> {
-                val options = NavOptions.Builder()
-                    .setLaunchSingleTop(true)
-                    .setRestoreState(false)
-                    .build()
-                p0.findNavController().navigate(R.id.action_startCollectionFragment_to_wallCategoriesFragment, Bundle().apply {
-                    putString("link","/api/r3/live/")
-                    putString("name", resources.getString(R.string.liveCategories))
-                }, options)
+                if(uiState != null){
+                    p0.findNavController().navigate(R.id.action_startCollectionFragment_to_wallCategoriesFragment, Bundle().apply {
+                        putString(ARG_NAME, resources.getString(R.string.liveCategories))
+                        putSerializable(ARG_LINK, uiState?.live?.linkForFull)
+                    })
+                }
+            }
+            binding.btnSeeAllAbstract -> {
+                if(uiState != null){
+                    //go to wallpapers
+                }
+            }
+            binding.btnSeeAllAll -> {
+                if(uiState != null){
+                    p0.findNavController().navigate(R.id.action_startCollectionFragment_to_wallCategoriesFragment, Bundle().apply {
+                        putString(ARG_NAME, resources.getString(R.string.allCategories))
+                        putSerializable(ARG_LINK, uiState?.all?.linkForFull)
+                    })
+                }
+            }
+            binding.btnSeeAllNew -> {
+                if(uiState != null){
+                    p0.findNavController().navigate(R.id.action_startCollectionFragment_to_wallCategoriesFragment, Bundle().apply {
+                        putString(ARG_NAME, resources.getString(R.string.newCategories))
+                        putSerializable(ARG_LINK, uiState?.new?.linkForFull)
+                    })
+                }
+            }
+            binding.btnSeeAllCalm -> {
+                if(uiState != null){
+                    //go to wallpapers
+                }
+            }
+            binding.btnSeeAllPopular -> {
+                if(uiState != null){
+                    p0.findNavController().navigate(R.id.action_startCollectionFragment_to_wallCategoriesFragment, Bundle().apply {
+                        putString(ARG_NAME, resources.getString(R.string.popularCategories))
+                        putSerializable(ARG_LINK, uiState?.popular?.linkForFull)
+                    })
+                }
+            }
+            binding.btnSeeAllFlash -> {
 
             }
         }

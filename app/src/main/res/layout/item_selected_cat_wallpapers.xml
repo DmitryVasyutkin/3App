@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginEnd="10dp"
+    android:layout_margin="5dp"
     android:background="@android:color/transparent">
 
     <com.google.android.material.card.MaterialCardView
@@ -16,7 +16,7 @@
         >
 
         <ImageView
-            android:id="@+id/iv_wallpaperPreview"
+            android:id="@+id/iv_wallpaperPreview_selectedCat"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="fitXY"/>

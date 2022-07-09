@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import io.mobidoo.a3app.entity.uistate.allcollectionstate.AllCollectionsUIState
+import io.mobidoo.a3app.entity.uistate.allcollectionstate.WallpapersUIState
 import io.mobidoo.a3app.entity.uistate.allcollectionstate.toUIState
 import io.mobidoo.a3app.utils.AppUtils
 import io.mobidoo.domain.common.ResultData
@@ -27,6 +28,8 @@ class MainActivityViewModel(
     private val _uiStateFlow =  MutableStateFlow(AllCollectionsUIState())
     val uiStateFlow = _uiStateFlow.asStateFlow()
 
+
+
     fun getStartCollection() = viewModelScope.launch {
         if (AppUtils.isNetworkAvailable(app)){
             when(val result = getStartCollectionUseCase.invoke()){
@@ -35,6 +38,7 @@ class MainActivityViewModel(
                 )
                 }
                 is ResultData.Success -> {
+                    delay(300)
                     _uiStateFlow.value = result.value.toUIState().apply {
                         isLoading = false
                     }
@@ -51,5 +55,6 @@ class MainActivityViewModel(
             )
         }
     }
+
 
 }

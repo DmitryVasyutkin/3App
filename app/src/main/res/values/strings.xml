@@ -18,4 +18,18 @@
     <string name="share_flash">Share</string>
     <string name="download_flash">Download</string>
     <string name="liveCategories">Live Categories</string>
+    <string name="splashMessage1">Ringtones for Android</string>
+    <string name="splashMessage2"><![CDATA[Ringtones & Animations]]></string>
+    <string name="splashMessageHeader2">Connecting</string>
+    <string name="splashMessage3">to database</string>
+    <string name="welcomeTo">welcome to</string>
+    <string name="ringtonesforAndroid">Ringtones \nfor Android</string>
+    <string name="GladSeeYou">Glad to see\nyou\nagain!</string>
+    <string name="install">Install</string>
+    <string name="loremipsum">"Lorem ipsum dolor sit amet? \n Pertinax nec, in mei nostrum omittantur. Quo no orem ipsum dolor "</string>
+    <string name="abstractCategories">Abstract categories</string>
+    <string name="allCategories">All categories</string>
+    <string name="newCategories">NewCategories</string>
+    <string name="calmCategories">Calm categories</string>
+    <string name="popularCategories">Popular categories</string>
 </resources>

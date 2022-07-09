@@ -32,4 +32,5 @@
         <item name="android:windowBackground">@color/mainBackGround</item>
         <item name="android:colorBackground">@color/mainBackGround</item>
     </style>
+
 </resources>

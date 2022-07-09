@@ -9,5 +9,6 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="mainBackGround">#19181E</color>
+    <color name="collectionBackground">#272533</color>
     <color name="shimmerBackground">#B3B3B3</color>
 </resources>

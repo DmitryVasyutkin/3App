@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.gms.ads.nativead.NativeAdView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+     >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/ad_headline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/ad_app_icon"
+            android:text="@string/loremipsum"
+            android:textSize="16sp"
+            android:layout_marginStart="20dp"/>
+
+        <ImageView
+            android:id="@+id/ad_app_icon"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_above="@+id/btnNativeAdAction"
+            android:background="@color/mainBackGround"
+            android:scaleType="fitXY" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNativeAdAction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/install"
+            android:background="@drawable/gradient_violet"
+            app:backgroundTint="@null"
+            android:foreground="?attr/selectableItemBackground"
+            android:layout_margin="30dp"
+            android:layout_alignParentBottom="true"/>
+
+    </RelativeLayout>
+
+</com.google.android.gms.ads.nativead.NativeAdView>

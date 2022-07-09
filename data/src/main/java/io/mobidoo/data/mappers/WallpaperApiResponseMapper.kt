@@ -13,16 +13,16 @@ class WallpaperApiResponseMapper {
     fun transformWallpaperItem(item: WallpaperItem) : Wallpaper{
         return Wallpaper(item.url, item.image)
     }
-    fun transformWallpapersList(response: WallpapersResponse) : List<Wallpaper>{
-        return response.items.map { transformWallpaperItem(it) }
+    fun transformWallpapersList(response: List<WallpaperItem>) : List<Wallpaper>{
+        return response.map { transformWallpaperItem(it) }
     }
 
     fun transformSubCategoryResponse(response: SubCategoryResponse) : SubCategory{
         return SubCategory(response.name, response.array.map { transformWallpaperItem(it) }, response.type, response.wallpapersLink)
     }
 
-    fun transformSubCategoriesList(response: SubCategoryListResponse) : List<SubCategory>{
-        return response.items.map { transformSubCategoryResponse(it) }
+    fun transformSubCategoriesList(response: List<SubCategoryResponse>) : List<SubCategory>{
+        return response.map { transformSubCategoryResponse(it) }
     }
 
     fun transformCategoryResponse(response: CategoryResponse) : Category{
