@@ -23,9 +23,13 @@ import io.mobidoo.a3app.databinding.FragmentStartCollectionBinding
 import io.mobidoo.a3app.di.Injector
 import io.mobidoo.a3app.entity.uistate.allcollectionstate.AllCollectionsUIState
 import io.mobidoo.a3app.ui.MainActivity
+import io.mobidoo.a3app.ui.WallpaperActivity
+import io.mobidoo.a3app.utils.AppUtils
+import io.mobidoo.a3app.utils.AppUtils.getWallpaperTypeFromLink
 import io.mobidoo.a3app.viewmodels.MainActivityViewModel
 import io.mobidoo.a3app.viewmodels.MainActivityViewModelFactory
 import io.mobidoo.domain.common.Constants.WALLS_HEIGHT_TO_WIDTH_DIMENSION
+import io.mobidoo.domain.entities.wallpaper.Wallpaper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
@@ -136,15 +140,32 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
         it.abstract?.startArray?.let { it1 -> abstractWallsAdapter.setList(it1) }
 
     }
-
+    private fun handleIemClick(item: Wallpaper){
+        startActivity(
+            WallpaperActivity.getIntent(requireActivity(), item.url, resources.getString(R.string.common_folder), getWallpaperTypeFromLink(item.url)))
+    }
     private fun initializeRecyclers() {
-        liveWallsAdapter = StartWallpaperCollectionsAdapter()
-        flashCallAdapter = StartFlashCallsAdapters()
-        newWallsAdapter = StartWallpaperCollectionsAdapter()
-        allWallsAdapter = StartWallpaperCollectionsAdapter()
-        popularWallsAdapter = StartWallpaperCollectionsAdapter()
-        calmWallsAdapter = StartWallpaperCollectionsAdapter()
-        abstractWallsAdapter = StartWallpaperCollectionsAdapter()
+        liveWallsAdapter = StartWallpaperCollectionsAdapter {
+            handleIemClick(it)
+        }
+        flashCallAdapter = StartFlashCallsAdapters(){
+            //TODO
+        }
+        newWallsAdapter = StartWallpaperCollectionsAdapter{
+            handleIemClick(it)
+        }
+        allWallsAdapter = StartWallpaperCollectionsAdapter{
+            handleIemClick(it)
+        }
+        popularWallsAdapter = StartWallpaperCollectionsAdapter{
+            handleIemClick(it)
+        }
+        calmWallsAdapter = StartWallpaperCollectionsAdapter{
+            handleIemClick(it)
+        }
+        abstractWallsAdapter = StartWallpaperCollectionsAdapter{
+            handleIemClick(it)
+        }
         binding.rvCollectionLive.apply {
             layoutManager = HorizontalLayoutManager(requireContext(), widthScale, heightToWidthScale)
             adapter = liveWallsAdapter
@@ -200,7 +221,7 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
     override fun onClick(p0: View?) {
         when(p0){
             binding.btnSeeAllLive -> {
-                if(uiState != null){
+                if(uiState?.live != null){
                     p0.findNavController().navigate(R.id.action_startCollectionFragment_to_wallCategoriesFragment, Bundle().apply {
                         putString(ARG_NAME, resources.getString(R.string.liveCategories))
                         putSerializable(ARG_LINK, uiState?.live?.linkForFull)
@@ -208,12 +229,15 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
                 }
             }
             binding.btnSeeAllAbstract -> {
-                if(uiState != null){
-                    //go to wallpapers
+                if(uiState?.abstract != null){
+                    p0.findNavController().navigate(R.id.action_startCollectionFragment_to_selectedCategoryWallpapersFragment, Bundle().apply {
+                        putString(StartCollectionFragment.ARG_NAME, resources.getString(R.string.Abstract))
+                        putString(StartCollectionFragment.ARG_LINK, uiState?.abstract?.linkForFull)
+                    })
                 }
             }
             binding.btnSeeAllAll -> {
-                if(uiState != null){
+                if(uiState?.all != null){
                     p0.findNavController().navigate(R.id.action_startCollectionFragment_to_wallCategoriesFragment, Bundle().apply {
                         putString(ARG_NAME, resources.getString(R.string.allCategories))
                         putSerializable(ARG_LINK, uiState?.all?.linkForFull)
@@ -221,7 +245,7 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
                 }
             }
             binding.btnSeeAllNew -> {
-                if(uiState != null){
+                if(uiState?.new != null){
                     p0.findNavController().navigate(R.id.action_startCollectionFragment_to_wallCategoriesFragment, Bundle().apply {
                         putString(ARG_NAME, resources.getString(R.string.newCategories))
                         putSerializable(ARG_LINK, uiState?.new?.linkForFull)
@@ -229,12 +253,15 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
                 }
             }
             binding.btnSeeAllCalm -> {
-                if(uiState != null){
-                    //go to wallpapers
+                if(uiState?.pattern != null){
+                    p0.findNavController().navigate(R.id.action_startCollectionFragment_to_selectedCategoryWallpapersFragment, Bundle().apply {
+                        putString(StartCollectionFragment.ARG_NAME, resources.getString(R.string.calm))
+                        putString(StartCollectionFragment.ARG_LINK, uiState?.abstract?.linkForFull)
+                    })
                 }
             }
             binding.btnSeeAllPopular -> {
-                if(uiState != null){
+                if(uiState?.popular != null){
                     p0.findNavController().navigate(R.id.action_startCollectionFragment_to_wallCategoriesFragment, Bundle().apply {
                         putString(ARG_NAME, resources.getString(R.string.popularCategories))
                         putSerializable(ARG_LINK, uiState?.popular?.linkForFull)
@@ -242,7 +269,7 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
                 }
             }
             binding.btnSeeAllFlash -> {
-
+                (activity as MainActivity).navigateToFlashCalls()
             }
         }
     }

@@ -11,6 +11,9 @@
         <action
             android:id="@+id/action_startCollectionFragment_to_wallCategoriesFragment"
             app:destination="@id/wallCategoriesFragment" />
+        <action
+            android:id="@+id/action_startCollectionFragment_to_selectedCategoryWallpapersFragment"
+            app:destination="@id/selectedCategoryWallpapersFragment" />
     </fragment>
     <fragment
         android:id="@+id/wallCategoriesFragment"

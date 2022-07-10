@@ -1,5 +1,7 @@
 package io.mobidoo.a3app.ui
 
+import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
@@ -18,8 +20,10 @@ import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
+
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+    private var navHostFragment: NavHostFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,9 +31,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.bottomNavView.itemIconTintList = null
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container) as NavHostFragment
-        navController = navHostFragment.navController
+        navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container) as NavHostFragment
+        navController = navHostFragment?.navController!!
+
         NavigationUI.setupWithNavController(binding.bottomNavView, navController)
     }
 
+
+    fun navigateToFlashCalls(){
+        binding.bottomNavView.selectedItemId = R.id.flashcalls
+    }
 }

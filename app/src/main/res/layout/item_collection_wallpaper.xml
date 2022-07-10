@@ -9,17 +9,18 @@
     android:background="@android:color/transparent">
 
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cv_wallpapersRVItem"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:cardCornerRadius="10dp"
         app:cardElevation="0dp"
-        >
+        android:foreground="?attr/selectableItemBackground">
 
         <ImageView
             android:id="@+id/iv_wallpaperPreview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitXY"/>
+            android:scaleType="centerCrop"/>
 
     </com.google.android.material.card.MaterialCardView>
 

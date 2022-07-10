@@ -1,5 +1,6 @@
 package io.mobidoo.data.repository.wallpaper
 
+import android.util.Log
 import io.mobidoo.data.mappers.WallpaperApiResponseMapper
 import io.mobidoo.data.repository.wallpaper.datasource.WallpapersRemoteDataSource
 import io.mobidoo.data.utils.TransformUtils.toResultData
@@ -24,6 +25,8 @@ class WallpaperRepositoryImpl(
     }
 
     override suspend fun getSubcategories(link: String): ResultData<List<SubCategory>> {
+        Log.i("WallRepo", "link = $link")
+        Log.i("WallRepo", "dataSource result = ${wallpapersRemoteDataSource.getSubcategories(link).toResultData()}")
         return transformResult(wallpapersRemoteDataSource.getSubcategories(link).toResultData()){
             wallpaperMapper.transformSubCategoriesList(it)
         }

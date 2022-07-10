@@ -6,6 +6,7 @@ import java.io.Serializable
 data class Wallpaper(
     val url: String,
     val previewUrl: String,
-    var type: String = Constants.TYPE_WALLPAPER
+    var type: String = Constants.TYPE_WALLPAPER,
+    var categoryName: String? = null
 ) : Serializable
 

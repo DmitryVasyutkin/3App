@@ -1,19 +1,15 @@
 package io.mobidoo.a3app.adapters
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import io.mobidoo.a3app.databinding.ItemSelectedCatWallpapersBinding
 import io.mobidoo.a3app.databinding.ItemWallpaperRecyclerBinding
 import io.mobidoo.a3app.databinding.LayoutAdCollectionsBinding
 import io.mobidoo.a3app.entity.startcollectionitem.ResizedGridLayoutManager
 import io.mobidoo.a3app.entity.startcollectionitem.SelectedCategoryWallpapersFragment
 import io.mobidoo.a3app.entity.startcollectionitem.WallpaperRecyclerItem
-import io.mobidoo.a3app.utils.AppUtils
 
-class WallpaperRecyclerItemAdapter(private val onClick: (String) -> (Unit)) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class FlashCallRecyclerItemAdapter (private val onClick: (String) -> (Unit)) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val list = arrayListOf<WallpaperRecyclerItem>()
 
@@ -53,7 +49,9 @@ class WallpaperRecyclerItemAdapter(private val onClick: (String) -> (Unit)) : Re
         RecyclerView.ViewHolder(binding.root) {
 
         fun onBind(item: WallpaperRecyclerItem) {
-            val wallAdapter = WallpaperAdapter(onClick)
+            val wallAdapter = StartFlashCallsAdapters{
+                onClick(it)
+            }
             binding.rvSelectedCategoryWallpapers.apply {
                 layoutManager = ResizedGridLayoutManager(itemView.context, SelectedCategoryWallpapersFragment.widthScale, SelectedCategoryWallpapersFragment.heightToWidthScale, 3)
                 adapter = wallAdapter

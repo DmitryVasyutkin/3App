@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-     >
+    android:paddingBottom="30dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -12,24 +12,24 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/ad_headline"
+            android:id="@+id/ad_headline_success"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/ad_app_icon"
+            android:layout_above="@+id/ad_app_icon_success"
             android:text="@string/loremipsum"
             android:textSize="16sp"
             android:layout_marginStart="20dp"/>
 
         <ImageView
-            android:id="@+id/ad_app_icon"
+            android:id="@+id/ad_app_icon_success"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:layout_above="@+id/btnNativeAdAction"
+            android:layout_above="@+id/btnNativeAdActionSuccess"
             android:background="@color/mainBackGround"
             android:scaleType="fitXY" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnNativeAdAction"
+            android:id="@+id/btnNativeAdActionSuccess"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"

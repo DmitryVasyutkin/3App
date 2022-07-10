@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/wallpaper_nav_graph"
+    app:startDestination="@id/wallpaperActionFragment">
+
+    <fragment
+        android:id="@+id/wallpaperActionFragment"
+        android:name="io.mobidoo.a3app.ui.wallpaperpreview.WallpaperPreviewFragment"
+        android:label="WallpaperActionFragment" >
+
+        <argument android:name="link"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_wallpaperActionFragment_to_wallpaperPreviewSuccessFragment"
+            app:destination="@id/wallpaperPreviewSuccessFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/wallpaperPreviewSuccessFragment"
+        android:name="io.mobidoo.a3app.ui.wallpaperpreview.WallpaperPreviewSuccessFragment"
+        android:label="WallpaperPreviewSuccessFragment" />
+</navigation>

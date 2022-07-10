@@ -16,10 +16,13 @@ import io.mobidoo.a3app.databinding.FragmentWallpaperCategoriesBinding
 import io.mobidoo.a3app.di.Injector
 import io.mobidoo.a3app.entity.startcollectionitem.SubCategoryRecyclerItem
 import io.mobidoo.a3app.entity.uistate.allcollectionstate.WallCategoriesUIState
+import io.mobidoo.a3app.ui.WallpaperActivity
+import io.mobidoo.a3app.utils.AppUtils
 import io.mobidoo.a3app.viewmodels.WallCategoriesViewModel
 import io.mobidoo.a3app.viewmodels.WallCategoriesViewModelFactory
 import io.mobidoo.domain.common.Constants
 import io.mobidoo.domain.common.Constants.WALLS_HEIGHT_TO_WIDTH_DIMENSION
+import io.mobidoo.domain.entities.wallpaper.Wallpaper
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -55,9 +58,12 @@ class WallCategoriesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.tvCategoriesName.text = arguments?.getString(StartCollectionFragment.ARG_NAME)
-        categoriesAdapter = WallpaperCategoriesAdapter {l, n ->
+        categoriesAdapter = WallpaperCategoriesAdapter({l, n ->
             getAllWalls(l, n)
-        }
+        },
+            {
+                openWallpaper(it)
+            })
         binding.rvWallCategories.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = categoriesAdapter
@@ -73,6 +79,15 @@ class WallCategoriesFragment : Fragment() {
         binding.ibBackCategories.setOnClickListener {
             activity?.onBackPressed()
         }
+    }
+
+    private fun openWallpaper(it: Wallpaper) {
+        startActivity(
+            WallpaperActivity.getIntent(
+                requireActivity(), it.url, it.categoryName?: resources.getString(R.string.common_folder),
+                AppUtils.getWallpaperTypeFromLink(it.url)
+            )
+        )
     }
 
     private fun handleUIState(uiState: WallCategoriesUIState) {

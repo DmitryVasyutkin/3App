@@ -11,7 +11,9 @@ import io.mobidoo.a3app.utils.AppUtils
 import io.mobidoo.domain.common.Constants
 import io.mobidoo.domain.entities.wallpaper.Wallpaper
 
-class StartFlashCallsAdapters : RecyclerView.Adapter<StartFlashCallsAdapters.FlashCallViewHolder>() {
+class StartFlashCallsAdapters(
+    private val onItemClick: (String) -> (Unit)
+) : RecyclerView.Adapter<StartFlashCallsAdapters.FlashCallViewHolder>() {
 
     private val list = arrayListOf<Wallpaper>()
 
@@ -38,6 +40,9 @@ class StartFlashCallsAdapters : RecyclerView.Adapter<StartFlashCallsAdapters.Fla
         fun onBind(item: Wallpaper){
             Log.i("RvAdapter", "flash holder")
             binding.ivFlashCallPreview.load(AppUtils.createFullLink(item.previewUrl))
+            binding.cvFlashCallRecyclerItem.setOnClickListener {
+                onItemClick(item.url)
+            }
         }
     }
 }

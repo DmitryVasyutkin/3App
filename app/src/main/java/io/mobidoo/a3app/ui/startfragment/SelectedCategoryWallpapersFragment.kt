@@ -14,8 +14,11 @@ import androidx.recyclerview.widget.RecyclerView
 import io.mobidoo.a3app.adapters.WallpaperRecyclerItemAdapter
 import io.mobidoo.a3app.databinding.FragmentSelectedCategoryWallpapersBinding
 import io.mobidoo.a3app.di.Injector
+import io.mobidoo.a3app.ui.WallpaperActivity
 import io.mobidoo.a3app.ui.startfragment.StartCollectionFragment
 import io.mobidoo.a3app.ui.startfragment.stop
+import io.mobidoo.a3app.ui.wallpaperpreview.WallpaperPreviewFragment
+import io.mobidoo.a3app.utils.AppUtils.getWallpaperTypeFromLink
 import io.mobidoo.a3app.viewmodels.WallCategoriesViewModel
 import io.mobidoo.a3app.viewmodels.WallCategoriesViewModelFactory
 import io.mobidoo.domain.common.Constants
@@ -27,6 +30,7 @@ class SelectedCategoryWallpapersFragment : Fragment(){
     companion object{
         const val widthScale = 0.32f
         const val heightToWidthScale = Constants.WALLS_HEIGHT_TO_WIDTH_DIMENSION
+
     }
     private var _binding: FragmentSelectedCategoryWallpapersBinding? = null
     private val binding get() = _binding!!
@@ -34,6 +38,8 @@ class SelectedCategoryWallpapersFragment : Fragment(){
     @Inject
     lateinit var factory: WallCategoriesViewModelFactory
     private lateinit var viewModel: WallCategoriesViewModel
+
+    private var categoryName =""
 
 
     override fun onAttach(context: Context) {
@@ -56,7 +62,9 @@ class SelectedCategoryWallpapersFragment : Fragment(){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.tvWallpapersCategoryName.text = arguments?.getString(StartCollectionFragment.ARG_NAME)
-        wallpapersAdapter = WallpaperRecyclerItemAdapter()
+        wallpapersAdapter = WallpaperRecyclerItemAdapter(){
+            startActivity(WallpaperActivity.getIntent(requireActivity(), it, arguments?.getString(StartCollectionFragment.ARG_NAME)!!, getWallpaperTypeFromLink(it)) )
+        }
         lifecycleScope.launch {
             viewModel.wallUiStateFlow.collect(){
                 if(!it.isLoading){
@@ -82,6 +90,7 @@ class SelectedCategoryWallpapersFragment : Fragment(){
         }
         return result
     }
+
 }
 
 class ResizedGridLayoutManager(context: Context, private val widthScale: Float, private val heightToWidthScale: Int, count: Int) : GridLayoutManager(context, count){

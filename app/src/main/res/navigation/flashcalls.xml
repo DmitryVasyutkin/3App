@@ -6,6 +6,6 @@
 
     <fragment
         android:id="@+id/flashCallFragment"
-        android:name="io.mobidoo.a3app.ui.flashcall.FlashCallFragment"
+        android:name="io.mobidoo.a3app.ui.flashcall.FlashCallCollectionFragment"
         android:label="FlashCallFragment" />
 </navigation>

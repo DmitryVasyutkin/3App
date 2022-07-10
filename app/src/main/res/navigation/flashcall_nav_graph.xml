@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/wallpaper_nav_graph"
+    app:startDestination="@id/flashCallPreviewFragment">
+    <fragment
+        android:id="@+id/flashCallPreviewFragment"
+        android:name="io.mobidoo.a3app.ui.flashcall.FlashCallPreviewFragment"
+        android:label="FlashCallPreviewFragment" >
+        <action
+            android:id="@+id/action_flashCallPreviewFragment_to_wallpaperPreviewSuccessFragment2"
+            app:destination="@id/wallpaperPreviewSuccessFragment2" />
+    </fragment>
+    <fragment
+        android:id="@+id/wallpaperPreviewSuccessFragment2"
+        android:name="io.mobidoo.a3app.ui.wallpaperpreview.WallpaperPreviewSuccessFragment"
+        android:label="WallpaperPreviewSuccessFragment" />
+</navigation>

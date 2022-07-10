@@ -7,9 +7,13 @@ import io.mobidoo.a3app.databinding.ItemWallpaperCategoryBinding
 import io.mobidoo.a3app.databinding.LayoutAdCollectionsBinding
 import io.mobidoo.a3app.entity.startcollectionitem.SubCategoryRecyclerItem
 import io.mobidoo.a3app.ui.startfragment.HorizontalLayoutManager
+import io.mobidoo.domain.entities.wallpaper.Wallpaper
 import java.util.*
 
-class WallpaperCategoriesAdapter(private val onLinkClicked: (String, String) -> (Unit)) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class WallpaperCategoriesAdapter(
+    private val onLinkClicked: (String, String) -> (Unit),
+    private val onItemClicked: (Wallpaper) -> (Unit)
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val list = arrayListOf<SubCategoryRecyclerItem>()
 
@@ -43,7 +47,10 @@ class WallpaperCategoriesAdapter(private val onLinkClicked: (String, String) -> 
     inner class CategoriesViewHolder(private val binding: ItemWallpaperCategoryBinding): RecyclerView.ViewHolder(binding.root){
 
         fun onBind(item: SubCategoryRecyclerItem){
-            val wallsAdapter = StartWallpaperCollectionsAdapter()
+            val wallsAdapter = StartWallpaperCollectionsAdapter{
+                it.categoryName = item.name
+                onItemClicked(it)
+            }
             binding.tvCategoryName.text = item.name.replaceFirstChar {
                 if (it.isLowerCase()) it.titlecase(
                     Locale.getDefault()
