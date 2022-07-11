@@ -10,15 +10,15 @@ import io.mobidoo.domain.entities.ringtone.RingtoneCategory
 class RingtoneApiResponseMapper {
 
     fun toRingtoneList(response: RingtonesResponse) : List<Ringtone>{
-        return response.items.map { it.toRingtone() }
+        return response.ringtones.map { Ringtone(it.url, it.imageUrl, it.title, response.nameCategory, response.link) }
     }
 
     private fun RingtoneItem.toRingtone(): Ringtone{
         return Ringtone(url, imageUrl, title)
     }
 
-    fun toRingtoneCategoryList(response: RingtoneCategoryListResponse) : List<RingtoneCategory>{
-        return response.items.map { toRingtoneCategory(it) }
+    fun toRingtoneCategoryList(response: List<RingtoneCategoryResponse>) : List<RingtoneCategory>{
+        return response.map { toRingtoneCategory(it) }
     }
 
     fun toRingtoneCategory(response: RingtoneCategoryResponse) : RingtoneCategory{

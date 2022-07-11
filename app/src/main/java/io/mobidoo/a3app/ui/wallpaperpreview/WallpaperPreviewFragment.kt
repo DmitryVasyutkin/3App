@@ -1,6 +1,5 @@
 package io.mobidoo.a3app.ui.wallpaperpreview
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -95,6 +94,9 @@ class WallpaperPreviewFragment : Fragment() {
         binding.fabDownloadWall.setOnClickListener {
             downloadWallpaper(createFullLink(link), categoryName)
         }
+        binding.ibBackWallpaperPreview.setOnClickListener {
+            activity?.onBackPressed()
+        }
         view.findViewById<ImageButton>(R.id.ib_close_ad_wall_preview)?.setOnClickListener {
             binding.rlWallAdvertising.visibility = View.GONE
         }
@@ -121,7 +123,7 @@ class WallpaperPreviewFragment : Fragment() {
                     Log.i("WallpaperActionFragment", "file not loaded with: $message")
                 }
             })
-        setBottomInset(view)
+        setInsets(view)
         loadAd()
     }
 
@@ -147,16 +149,25 @@ class WallpaperPreviewFragment : Fragment() {
         NotificationManagerCompat.from(requireContext()).cancel(DOWNLOAD_NOTIFICATION_ID)
     }
 
-    private fun setBottomInset(view: View) {
+    private fun setInsets(view: View) {
         view.setOnApplyWindowInsetsListener { view, windowInsets ->
             val botInset = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 windowInsets.getInsetsIgnoringVisibility(WindowInsets.Type.systemBars()).bottom
             } else {
                 windowInsets.stableInsetBottom
             }
-            val params = binding.root.layoutParams as ViewGroup.MarginLayoutParams
-            params.setMargins(0, 0, 0, botInset)
-            binding.root.layoutParams = params
+            val topInsets = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                windowInsets.getInsetsIgnoringVisibility(WindowInsets.Type.systemBars()).top
+            } else {
+                windowInsets.stableInsetTop
+            }
+            val params = binding.subConstraintWallpaperPreview.layoutParams as ViewGroup.MarginLayoutParams
+            params.setMargins(0, topInsets, 0, botInset)
+            binding.subConstraintWallpaperPreview.layoutParams = params
+
+//            val ibParams = binding.ibBackWallpaperPreview.layoutParams as ViewGroup.MarginLayoutParams
+//            params.setMargins(0, topInsets, 0, 0)
+//            binding.ibBackWallpaperPreview.layoutParams = ibParams
 
             return@setOnApplyWindowInsetsListener windowInsets
         }
@@ -172,7 +183,7 @@ class WallpaperPreviewFragment : Fragment() {
             if(wallpaperType == TYPE_STATIC)
                 downloadManager.downloadStaticWallpaper(link, subFolder)
             else
-                downloadManager.downloadLiveWallpaper(link, subFolder)
+                downloadManager.downloadLiveWallpaper(link, subFolder, false)
         }
 
     }
@@ -223,6 +234,10 @@ class WallpaperPreviewFragment : Fragment() {
                 if (!previewShowing)
                     showAdvertising()
                 Log.i("WallpaperActionFragment", "nativeAd $nativeAd")
+                if(isDetached){
+                    nativeAd.destroy()
+                    return@forNativeAd
+                }
             }
             .withAdListener(object : AdListener(){
                 override fun onAdFailedToLoad(p0: LoadAdError) {

@@ -84,11 +84,16 @@ class SplashActivity : AppCompatActivity() {
     private fun loadAd(){
         val builder = AdLoader.Builder(this, BuildConfig.AD_MOB_KEY)
             .forNativeAd { nativeAd ->
+
                 val adView = layoutInflater.inflate(R.layout.layout_ad_splash, null) as NativeAdView
 
                 adView.findViewById<TextView>(R.id.ad_headline).text = nativeAd.headline
                 adView.findViewById<ImageView>(R.id.ad_app_icon).load(nativeAd.icon?.drawable)
                 Log.i("SplashScreen", "nativeAd $nativeAd")
+                if(isDestroyed){
+                    nativeAd.destroy()
+                    return@forNativeAd
+                }
             }
             .withAdListener(object : AdListener(){
                 override fun onAdFailedToLoad(p0: LoadAdError) {

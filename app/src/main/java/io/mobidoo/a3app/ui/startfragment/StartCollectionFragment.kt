@@ -9,10 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavOptions
-import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.findNavController
-import androidx.navigation.ui.NavigationUI
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
@@ -22,18 +19,15 @@ import io.mobidoo.a3app.adapters.StartWallpaperCollectionsAdapter
 import io.mobidoo.a3app.databinding.FragmentStartCollectionBinding
 import io.mobidoo.a3app.di.Injector
 import io.mobidoo.a3app.entity.uistate.allcollectionstate.AllCollectionsUIState
+import io.mobidoo.a3app.ui.FlashCallPreviewActivity
 import io.mobidoo.a3app.ui.MainActivity
 import io.mobidoo.a3app.ui.WallpaperActivity
-import io.mobidoo.a3app.utils.AppUtils
 import io.mobidoo.a3app.utils.AppUtils.getWallpaperTypeFromLink
 import io.mobidoo.a3app.viewmodels.MainActivityViewModel
 import io.mobidoo.a3app.viewmodels.MainActivityViewModelFactory
 import io.mobidoo.domain.common.Constants.WALLS_HEIGHT_TO_WIDTH_DIMENSION
 import io.mobidoo.domain.entities.wallpaper.Wallpaper
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.observeOn
 import javax.inject.Inject
 
 class StartCollectionFragment : Fragment(), View.OnClickListener {
@@ -149,7 +143,7 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
             handleIemClick(it)
         }
         flashCallAdapter = StartFlashCallsAdapters(){
-            //TODO
+            handleFlashCallItemClick(it)
         }
         newWallsAdapter = StartWallpaperCollectionsAdapter{
             handleIemClick(it)
@@ -201,6 +195,10 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
             adapter = abstractWallsAdapter
             setHasFixedSize(true)
         }
+    }
+
+    private fun handleFlashCallItemClick(url: String) {
+        startActivity(FlashCallPreviewActivity.getIntent(requireActivity(), url, resources.getString(R.string.flash_calls)))
     }
 
     override fun onResume() {

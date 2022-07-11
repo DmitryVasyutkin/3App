@@ -66,6 +66,7 @@ class FlashCallPreviewFragment : Fragment() {
         link = requireActivity().intent?.extras?.getString(FlashCallPreviewActivity.EXTRA_WALLPAPER_LINK).toString()
         categoryName = requireActivity().intent?.extras?.getString(FlashCallPreviewActivity.EXTRA_CATEGORY_NAME).toString()
         initializePlayer()
+        Log.i("WallpaperActionFragment", "flash call link ${createFullLink(link)}")
         downloadManager = MediaLoadManager(requireContext().contentResolver, resources,
             object : FileDownloaderListener {
                 override suspend fun success(path: String) {
@@ -78,7 +79,7 @@ class FlashCallPreviewFragment : Fragment() {
                     Log.i("WallpaperActionFragment", "file not loaded with: $message")
                 }
             })
-
+        setTopInset(view)
         binding.ibBackFlashCallPreview.setOnClickListener {
             activity?.finish()
         }
@@ -94,9 +95,9 @@ class FlashCallPreviewFragment : Fragment() {
             } else {
                 windowInsets.stableInsetBottom
             }
-            val params = binding.root.layoutParams as ViewGroup.MarginLayoutParams
+            val params = binding.subConstraintFlashPreview.layoutParams as ViewGroup.MarginLayoutParams
             params.setMargins(0, topInset, 0, 0)
-            binding.root.layoutParams = params
+            binding.subConstraintFlashPreview.layoutParams = params
 
             return@setOnApplyWindowInsetsListener windowInsets
         }
@@ -127,7 +128,7 @@ class FlashCallPreviewFragment : Fragment() {
     private fun downloadWallpaper(link: String, subFolder: String){
         showDownloadNotification()
         lifecycleScope.launch {
-            downloadManager.downloadLiveWallpaper(link, subFolder)
+            downloadManager.downloadLiveWallpaper(link, subFolder, true)
         }
     }
 
@@ -153,5 +154,11 @@ class FlashCallPreviewFragment : Fragment() {
             description = channelDescription
         }
         notificationManager.createNotificationChannel(chanel)
+    }
+
+    override fun onDestroyView() {
+        exoPlayer.stop()
+        exoPlayer.release()
+        super.onDestroyView()
     }
 }

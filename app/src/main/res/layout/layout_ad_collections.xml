@@ -36,12 +36,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/ad_app_icon"
-            android:text="@string/install"
             android:background="@color/collectionBackground"
-            android:textAlignment="viewStart"
-            app:backgroundTint="@null"
+            android:drawableEnd="@drawable/ic_baseline_arrow_forward_24"
             android:foreground="?attr/selectableItemBackground"
-            android:drawableEnd="@drawable/ic_baseline_arrow_forward_24"/>
+            android:text="@string/install"
+            android:textAlignment="viewStart"
+            app:backgroundTint="@null" />
 
     </RelativeLayout>
 

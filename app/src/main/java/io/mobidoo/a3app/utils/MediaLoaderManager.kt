@@ -104,14 +104,16 @@ class MediaLoadManager(
             IOUtils.closeQuietly(output)
         }
     }
-    suspend fun downloadLiveWallpaper(url: String, subFolder: String){
+    suspend fun downloadLiveWallpaper(url: String, subFolder: String, isFlashCall: Boolean){
         withContext(Dispatchers.IO){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 
                 val imageCollection = MediaStore.Video.Media.getContentUri(
                     MediaStore.VOLUME_EXTERNAL_PRIMARY
                 )
-                val relativeLocation = "${Environment.DIRECTORY_PICTURES}/${resources.getString(R.string.app_name)}/${resources.getString(R.string.live_)}/$subFolder"
+                val relativeLocation = if (!isFlashCall)
+                    "${Environment.DIRECTORY_PICTURES}/${resources.getString(R.string.app_name)}/${resources.getString(R.string.live_)}/$subFolder"
+                else "${Environment.DIRECTORY_PICTURES}/${resources.getString(R.string.app_name)}/${resources.getString(R.string.flash_calls)}"
                 val contentDetails = ContentValues().apply {
                     put(MediaStore.Video.Media.DISPLAY_NAME, url.getFileName())
                     put(MediaStore.Video.Media.RELATIVE_PATH, relativeLocation)

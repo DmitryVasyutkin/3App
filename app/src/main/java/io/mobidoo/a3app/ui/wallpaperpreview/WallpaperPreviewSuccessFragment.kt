@@ -96,6 +96,10 @@ class WallpaperPreviewSuccessFragment : Fragment() {
                 adView.findViewById<ImageView>(R.id.ad_app_icon_success).load(nativeAd.icon?.drawable)
                 if (thanksPressed)
                     showAdvertising()
+                if(this.isDetached){
+                    nativeAd.destroy()
+                    return@forNativeAd
+                }
             }
             .withAdListener(object : AdListener(){
                 override fun onAdFailedToLoad(p0: LoadAdError) {

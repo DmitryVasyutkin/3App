@@ -2,6 +2,7 @@ package io.mobidoo.data.api
 
 import io.mobidoo.data.entities.StartCollectionResponse
 import io.mobidoo.data.entities.ringtone.RingtoneCategoryListResponse
+import io.mobidoo.data.entities.ringtone.RingtoneCategoryResponse
 import io.mobidoo.data.entities.ringtone.RingtonesResponse
 import io.mobidoo.data.entities.wallpaper.SubCategoryListResponse
 import io.mobidoo.data.entities.wallpaper.SubCategoryResponse
@@ -19,7 +20,7 @@ interface ApiService {
     @GET("{link}")
     suspend fun getSubcategories(@Path("link", encoded = true) link: String) : Response<List<SubCategoryResponse>>
     @GET("/api/ringtones/")
-    suspend fun getRingtoneCategories() : Response<RingtoneCategoryListResponse>
+    suspend fun getRingtoneCategories() : Response<List<RingtoneCategoryResponse>>
     @GET("{link}")
     suspend fun getRingtones(@Path("link", encoded = true) link: String) : Response<RingtonesResponse>
 

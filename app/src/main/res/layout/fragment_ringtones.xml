@@ -3,14 +3,34 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/collectionBackground">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/ringtones"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/rvRingtoneCategories"/>
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmerRingtoneCategories"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:shimmer_shape="linear"
+        app:shimmer_repeat_mode="restart"
+        app:shimmer_duration="700">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <include layout="@layout/shimmer_layout_ringtone_categories_item"/>
+            <include layout="@layout/shimmer_layout_ringtone_categories_item"/>
+            <include layout="@layout/shimmer_layout_ringtone_categories_item"/>
+            <include layout="@layout/shimmer_layout_ringtone_categories_item"/>
+            <include layout="@layout/shimmer_layout_ringtone_categories_item"/>
+
+
+
+        </LinearLayout>
+    </com.facebook.shimmer.ShimmerFrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

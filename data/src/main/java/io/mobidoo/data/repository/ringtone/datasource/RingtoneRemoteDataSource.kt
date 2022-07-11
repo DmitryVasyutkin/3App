@@ -10,6 +10,6 @@ import retrofit2.Response
 
 interface RingtoneRemoteDataSource {
 
-    suspend fun getRingtoneCategories() : Response<RingtoneCategoryListResponse>
+    suspend fun getRingtoneCategories() : Response<List<RingtoneCategoryResponse>>
     suspend fun getRingtones(link: String) : Response<RingtonesResponse>
 }

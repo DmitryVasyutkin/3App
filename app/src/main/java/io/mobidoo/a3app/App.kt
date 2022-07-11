@@ -5,6 +5,7 @@ import io.mobidoo.a3app.di.Injector
 import io.mobidoo.a3app.di.common.AppComponent
 import io.mobidoo.a3app.di.common.AppModule
 import io.mobidoo.a3app.di.common.DaggerAppComponent
+import io.mobidoo.a3app.di.ringtonescope.RingtoneSubComponent
 import io.mobidoo.a3app.di.wallpaperscope.WallpapersSubComponent
 import javax.inject.Inject
 
@@ -21,5 +22,9 @@ class App : Application(), Injector {
 
     override fun createWallpaperSubComponent(): WallpapersSubComponent {
         return appComponent.wallpaperSubComponent().create()
+    }
+
+    override fun createRingtoneSubComponent(): RingtoneSubComponent {
+        return appComponent.ringtoneSubComponent().create()
     }
 }

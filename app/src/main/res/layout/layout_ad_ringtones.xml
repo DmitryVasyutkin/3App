@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.gms.ads.nativead.NativeAdView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:id="@+id/wallPreviewAdRootLayout"
+    android:background="@color/collectionBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ad_app_icon_ringtone"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_below="@+id/ad_headline"
+                android:layout_marginStart="15dp"
+                android:background="@color/mainBackGround"
+                android:scaleType="fitXY" />
+
+            <TextView
+                android:id="@+id/ad_headline_ringtone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:text="@string/loremipsum"
+                android:textSize="16sp"/>
+
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNativeAdRingtoneAction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/collectionBackground"
+            android:drawableEnd="@drawable/ic_ringtone_action"
+            android:paddingEnd="0dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:text="@string/install"
+            android:textAlignment="viewStart"
+            app:backgroundTint="@null" />
+
+    </LinearLayout>
+
+</com.google.android.gms.ads.nativead.NativeAdView>

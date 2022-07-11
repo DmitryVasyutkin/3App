@@ -9,123 +9,133 @@
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/player_view_flash_call"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"/>
 
-    <ImageButton
-        android:id="@+id/ib_back_flash_call_preview"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/ic_baseline_arrow_back_ios_new_24"
-        android:background="@drawable/bg_black_circle_share"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"/>
-
-    <ImageView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline1"
-        app:layout_constraintWidth_percent="0.3"
-        android:scaleType="fitXY"
-        android:src="@drawable/drawable_flash_call_volume"/>
+        android:layout_height="match_parent"
+        android:id="@+id/subConstraint_flash_preview">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline1">
+        <ImageButton
+            android:id="@+id/ib_back_flash_call_preview"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/ic_baseline_arrow_back_ios_new_24"
+            android:background="@drawable/bg_black_circle_share"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"/>
 
-        <TextView
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline1"
+            app:layout_constraintBottom_toBottomOf="@+id/linearLayout3"
+            android:scaleType="fitXY"
+            android:src="@drawable/drawable_flash_call_volume" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/flashTunes"
-            android:textColor="@color/white"
-            android:gravity="center_horizontal"
-            android:textSize="30sp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline1">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/flashTunes"
+                android:textColor="@color/white"
+                android:gravity="center_horizontal"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                tools:textColor="@color/black"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/boostYourMood"
+                android:textColor="@color/white"
+                android:gravity="center_horizontal"
+                android:textSize="20sp"
+                tools:textColor="@color/black"/>
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.1" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.7" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <ImageButton
+            android:id="@+id/ib_share_flash_preview"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:src="@drawable/dr_share_flash"
+            android:background="@android:color/transparent"
+            android:scaleType="fitXY"
+            android:foreground="?attr/selectableItemBackground"
+            app:layout_constraintEnd_toEndOf="@+id/guideline3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/guideline2"
+            />
+
+        <ImageButton
+            android:id="@+id/ib_download_flash_preview"
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:src="@drawable/dr_download_flash"
+            android:background="@android:color/transparent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:foreground="?attr/selectableItemBackground"
+            android:scaleType="fitXY"
+            app:layout_constraintStart_toStartOf="@+id/guideline3"
+            app:layout_constraintTop_toTopOf="@+id/guideline2" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/share_flash"
             android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/guideline3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ib_share_flash_preview"
+            android:layout_marginTop="10dp"
+            android:textSize="23sp"
             tools:textColor="@color/black"/>
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/boostYourMood"
-            android:textColor="@color/white"
-            android:gravity="center_horizontal"
-            android:textSize="20sp"
+            android:text="@string/download_flash"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textStyle="bold"
+            android:textSize="23sp"
+            app:layout_constraintStart_toStartOf="@+id/guideline3"
+            app:layout_constraintTop_toBottomOf="@+id/ib_download_flash_preview"
+            android:layout_marginTop="10dp"
             tools:textColor="@color/black"/>
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.1" />
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.7" />
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
 
-    <ImageButton
-        android:id="@+id/ib_share_flash_preview"
-        android:layout_width="90dp"
-        android:layout_height="90dp"
-        android:src="@drawable/dr_share_flash"
-        android:background="@android:color/transparent"
-        android:scaleType="fitXY"
-        android:foreground="?attr/selectableItemBackground"
-        app:layout_constraintEnd_toEndOf="@+id/guideline3"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline2"
-        />
-
-    <ImageButton
-        android:id="@+id/ib_download_flash_preview"
-        android:layout_width="90dp"
-        android:layout_height="90dp"
-        android:src="@drawable/dr_download_flash"
-        android:background="@android:color/transparent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:foreground="?attr/selectableItemBackground"
-        android:scaleType="fitXY"
-        app:layout_constraintStart_toStartOf="@+id/guideline3"
-        app:layout_constraintTop_toTopOf="@+id/guideline2" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/share_flash"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="@+id/guideline3"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ib_share_flash_preview"
-        android:layout_marginTop="10dp"
-        android:textSize="23sp"
-        tools:textColor="@color/black"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/download_flash"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:textStyle="bold"
-        android:textSize="23sp"
-        app:layout_constraintStart_toStartOf="@+id/guideline3"
-        app:layout_constraintTop_toBottomOf="@+id/ib_download_flash_preview"
-        android:layout_marginTop="10dp"
-        tools:textColor="@color/black"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

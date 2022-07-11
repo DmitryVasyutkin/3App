@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/ringtone_nav_graph"
+    app:startDestination="@id/ringtoneCategoryItemsFragment">
+
+    <fragment
+        android:id="@+id/ringtoneCategoryItemsFragment"
+        android:name="io.mobidoo.a3app.ui.ringtone.RingtoneCategoryItemsFragment"
+        android:label="RingtoneCategoryItemsFragment" />
+</navigation>

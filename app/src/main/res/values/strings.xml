@@ -59,4 +59,6 @@
     <string name="thanks">Thanks</string>
     <string name="notification_download_wallpaper">Loading wallapaper</string>
     <string name="common_folder">Other</string>
+    <string name="ringtones_">Ringtones</string>
+    <string name="ringtonesforAndroid2">Ringtones for Android</string>
 </resources>

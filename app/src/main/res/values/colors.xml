@@ -11,4 +11,6 @@
     <color name="mainBackGround">#19181E</color>
     <color name="collectionBackground">#272533</color>
     <color name="shimmerBackground">#B3B3B3</color>
+    <color name="whiteAlpha4">#66FFFFFF</color>
+    <color name="audioControls">#3C0058</color>
 </resources>

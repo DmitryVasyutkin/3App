@@ -16,8 +16,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.3App.NoActionBar">
         <activity
-            android:name=".ui.FlashCallPreviewActivity"
+            android:name=".ui.RingtoneCategoryItemsActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.FlashCallPreviewActivity"
+            android:exported="false"
+            android:fitsSystemWindows="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.3App.NoActionBar.TransparentStatusBar" />
         <activity
             android:name=".ui.WallpaperActivity"
             android:exported="false"
