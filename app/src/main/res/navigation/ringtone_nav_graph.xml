@@ -7,5 +7,13 @@
     <fragment
         android:id="@+id/ringtoneCategoryItemsFragment"
         android:name="io.mobidoo.a3app.ui.ringtone.RingtoneCategoryItemsFragment"
-        android:label="RingtoneCategoryItemsFragment" />
+        android:label="RingtoneCategoryItemsFragment" >
+        <action
+            android:id="@+id/action_ringtoneCategoryItemsFragment_to_wallpaperPreviewSuccessFragment3"
+            app:destination="@id/wallpaperPreviewSuccessFragment3" />
+    </fragment>
+    <fragment
+        android:id="@+id/wallpaperPreviewSuccessFragment3"
+        android:name="io.mobidoo.a3app.ui.wallpaperpreview.WallpaperPreviewSuccessFragment"
+        android:label="WallpaperPreviewSuccessFragment" />
 </navigation>

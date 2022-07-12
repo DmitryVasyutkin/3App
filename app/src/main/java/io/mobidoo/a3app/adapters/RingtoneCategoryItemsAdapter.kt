@@ -16,7 +16,7 @@ import java.util.*
 
 class RingtoneCategoryItemsAdapter(
     private val onPlayClick: (Ringtone, Int) -> (Unit),
-    private val onActionClick: (Ringtone) -> Unit
+    private val onActionClick: (Ringtone, Int) -> Unit
 ) :  RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val list = arrayListOf<Ringtone>()
@@ -95,7 +95,7 @@ class RingtoneCategoryItemsAdapter(
                 onPlayClick(item, position)
             }
             binding.ibRingtoneAction.setOnClickListener {
-                onActionClick(item)
+                onActionClick(item, position)
             }
         }
     }

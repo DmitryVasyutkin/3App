@@ -61,4 +61,15 @@
     <string name="common_folder">Other</string>
     <string name="ringtones_">Ringtones</string>
     <string name="ringtonesforAndroid2">Ringtones for Android</string>
+    <string name="setAsRingtone">Set as a ringtone</string>
+    <string name="setContactRingtone">Set contact ringtone</string>
+    <string name="setAsNotification">Set as notification sound</string>
+    <string name="setAsAlarm">Set as an alarm ringtone</string>
+    <string name="download_ringtone">Download</string>
+    <string name="permissions">Permissions</string>
+    <string name="settingsPermissionMessage1">To be able to use this sound, you need to give the following permissions:</string>
+    <string name="settingsPermissionMessage2">Changing system settings</string>
+    <string name="settingsPermissionMessage3">This permission will allow the application to set a ringtone, sms/notification and alarm clock</string>
+    <string name="allow">Allow</string>
+    <string name="selectContact">Select a Contact</string>
 </resources>
