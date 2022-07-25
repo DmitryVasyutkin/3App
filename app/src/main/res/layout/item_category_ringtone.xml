@@ -3,12 +3,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="70dp">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/linearlayout5"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_centerVertical="true">
 
         <ImageButton
             android:id="@+id/ib_play_ringtone"
@@ -36,27 +38,33 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+    </LinearLayout>
+
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:orientation="vertical">
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/linearlayout5"
+            android:layout_toStartOf="@+id/ib_ringtone_action"
+            android:orientation="vertical"
+            android:layout_marginEnd="15dp">
 
             <TextView
                 android:id="@+id/tv_ringtone_title1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Best HipHop" />
+                android:text="Best HipHop"
+                android:maxLines="1"/>
 
             <TextView
                 android:id="@+id/tv_ringtone_title2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Love nwantity"
-                android:textColor="@color/whiteAlpha4" />
+                android:textColor="@color/whiteAlpha4"
+                android:maxLines="1"/>
         </LinearLayout>
 
-    </LinearLayout>
 
     <ImageButton
         android:id="@+id/ib_ringtone_action"
@@ -65,9 +73,9 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:layout_gravity="center_vertical|end"
-        android:padding="10dp"
         android:background="@android:color/transparent"
         android:foreground="?attr/selectableItemBackground"
+        android:padding="10dp"
         android:src="@drawable/ic_ringtone_action" />
 
 </RelativeLayout>

@@ -2,6 +2,7 @@ package io.mobidoo.a3app.ui.flashcall
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import io.mobidoo.a3app.BuildConfig
 import io.mobidoo.a3app.R
 import io.mobidoo.a3app.adapters.FlashCallRecyclerItemAdapter
 import io.mobidoo.a3app.adapters.WallpaperRecyclerItemAdapter
@@ -72,11 +78,41 @@ class FlashCallCollectionFragment : Fragment() {
                 else{
                     binding.shimmerFlashCallWallpapers.stop()
                 }
-                recyclerItemAdapter.setList(createList(it.array))
+                val list = createList(it.array)
+                loadAds(list.size /(Constants.AD_FREQUENCY_WALLPAPERS *3))
+                recyclerItemAdapter.setList(list)
             }
         }
     }
+    private fun loadAds(count: Int){
+        Log.i("FlashCall", "loadAds count $count")
+        val builder = AdLoader.Builder(requireContext(), BuildConfig.AD_MOB_KEY)
+            .forNativeAd { nativeAd ->
 
+                if(isDetached){
+                    nativeAd.destroy()
+                    return@forNativeAd
+                }
+
+                recyclerItemAdapter.setNativeAd(nativeAd)
+            }
+            .withAdListener(object : AdListener(){
+                override fun onAdLoaded() {
+                    super.onAdLoaded()
+
+                    Log.i("FlashCall", "onAdLoaded")
+                }
+
+                override fun onAdFailedToLoad(p0: LoadAdError) {
+
+                    Log.i("FlashCall", "nativeAd failed ${p0.message}")
+                }
+            })
+            .build()
+        val request = AdRequest.Builder()
+            .build()
+        builder.loadAds(request, count)
+    }
     private fun openFlashCall(url: String) {
         startActivity(FlashCallPreviewActivity.getIntent(requireActivity(), url, resources.getString(
             R.string.flash_calls)))

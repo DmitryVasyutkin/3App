@@ -75,6 +75,7 @@
             android:background="@drawable/gradient_violet"
             android:textAlignment="center"
             app:backgroundTint="@null"
+            android:textColor="@color/white"
             android:foreground="?attr/selectableItemBackground"
             android:layout_margin="10dp"/>
     </LinearLayout>

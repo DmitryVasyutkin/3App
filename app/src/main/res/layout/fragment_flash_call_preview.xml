@@ -12,6 +12,38 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"/>
 
+    <RelativeLayout
+        android:id="@+id/rl_loading_flashcall"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerInParent="true">
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center_horizontal"
+                app:trackThickness="5dp"
+                app:trackColor="@color/purple_200"
+                android:indeterminate="true"
+                style="@style/Widget.Material3.CircularProgressIndicator.Medium"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/loadingFlashCall"
+                android:textAlignment="center"
+                android:textColor="@color/purple_500"/>
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -93,7 +125,6 @@
             android:src="@drawable/dr_share_flash"
             android:background="@android:color/transparent"
             android:scaleType="fitXY"
-            android:foreground="?attr/selectableItemBackground"
             app:layout_constraintEnd_toEndOf="@+id/guideline3"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline2"
@@ -106,7 +137,6 @@
             android:src="@drawable/dr_download_flash"
             android:background="@android:color/transparent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:foreground="?attr/selectableItemBackground"
             android:scaleType="fitXY"
             app:layout_constraintStart_toStartOf="@+id/guideline3"
             app:layout_constraintTop_toTopOf="@+id/guideline2" />

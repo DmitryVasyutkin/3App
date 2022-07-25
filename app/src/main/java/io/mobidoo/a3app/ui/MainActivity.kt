@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -20,25 +21,33 @@ import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
-
-    private lateinit var binding: ActivityMainBinding
+ //   private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private var navHostFragment: NavHostFragment? = null
 
+    private lateinit var bottomNavView: BottomNavigationView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        binding.bottomNavView.itemIconTintList = null
+     //   binding = ActivityMainBinding.inflate(layoutInflater)
+        Log.i("MainActivityTimes", "before setcontent")
+        setContentView(R.layout.activity_main)
+        Log.i("MainActivityTimes", "after setcontent")
+        bottomNavView = findViewById(R.id.bottomNavView)
+        bottomNavView.itemIconTintList = null
         navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container) as NavHostFragment
+        Log.i("MainActivityTimes", "after findFragmentById")
         navController = navHostFragment?.navController!!
-
-        NavigationUI.setupWithNavController(binding.bottomNavView, navController)
+        Log.i("MainActivityTimes", "after navHostFragment?.navController!!")
+        NavigationUI.setupWithNavController(bottomNavView, navController)
+        Log.i("MainActivityTimes", "after setupWithNavController")
     }
 
-
     fun navigateToFlashCalls(){
-        binding.bottomNavView.selectedItemId = R.id.flashcalls
+        bottomNavView.selectedItemId = R.id.flashcalls
+    }
+
+    fun navigateToLiveWalls(){
+        bottomNavView.selectedItemId = R.id.live
     }
 }

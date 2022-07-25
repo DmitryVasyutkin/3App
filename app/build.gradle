@@ -82,10 +82,13 @@ dependencies {
     implementation "com.airbnb.android:lottie:$lottieVersion"
 
     //adMob
-    implementation 'com.google.android.gms:play-services-ads:21.0.0'
+    implementation 'com.google.android.gms:play-services-location:20.0.0'
+    implementation 'com.google.android.gms:play-services-ads:21.1.0'
 
     def exo_player = "2.18.0"
     implementation "com.google.android.exoplayer:exoplayer:$exo_player"
     implementation "com.google.android.exoplayer:exoplayer-core:$exo_player"
     implementation "com.google.android.exoplayer:exoplayer-ui:$exo_player"
+
+
 }

@@ -37,7 +37,6 @@ class StartWallpaperCollectionsAdapter(private val onClick: (Wallpaper) -> (Unit
 
     inner class WallpapersViewHolder(private val binding: ItemCollectionWallpaperBinding) : RecyclerView.ViewHolder(binding.root){
         fun onBind(item: Wallpaper){
-            Log.i("RvAdapter", "wall holder")
             binding.ivWallpaperPreview.load(createFullLink(item.previewUrl))
             binding.cvWallpapersRVItem.setOnClickListener {
                 onClick(item)

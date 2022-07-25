@@ -2,6 +2,7 @@ package io.mobidoo.a3app.ui.startfragment
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.ads.*
+import com.google.android.gms.ads.initialization.InitializationStatus
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener
+import com.google.android.gms.ads.nativead.NativeAd
+import io.mobidoo.a3app.BuildConfig
 import io.mobidoo.a3app.R
 import io.mobidoo.a3app.adapters.WallpaperCategoriesAdapter
 import io.mobidoo.a3app.databinding.FragmentWallpaperCategoriesBinding
@@ -24,6 +30,7 @@ import io.mobidoo.domain.common.Constants
 import io.mobidoo.domain.common.Constants.WALLS_HEIGHT_TO_WIDTH_DIMENSION
 import io.mobidoo.domain.entities.wallpaper.Wallpaper
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 class WallCategoriesFragment : Fragment() {
@@ -37,7 +44,10 @@ class WallCategoriesFragment : Fragment() {
 
     @Inject lateinit var factory: WallCategoriesViewModelFactory
     private lateinit var viewModel: WallCategoriesViewModel
-
+    private val nativeAds = arrayListOf<NativeAd>()
+    private var adsInitialized = false
+    private var adsLoadingNow  = false
+    private var arraySize = 0
 
     override fun onAttach(context: Context) {
         (activity?.application as Injector).createWallpaperSubComponent().inject(this)
@@ -57,7 +67,21 @@ class WallCategoriesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.tvCategoriesName.text = arguments?.getString(StartCollectionFragment.ARG_NAME)
+//        val request = RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("34A6AF4C95E8EC517667A12EF589AB8B")).build()
+//        MobileAds.setRequestConfiguration(request)
+//        MobileAds.initialize(requireContext(), object: OnInitializationCompleteListener {
+//            override fun onInitializationComplete(p0: InitializationStatus) {
+//                adsInitialized = true
+//                if (!adsLoadingNow){
+//                    loadAds(arraySize / (Constants.AD_FREQUENCY_WALLPAPERS * 3))
+//                    adsLoadingNow = true
+//                }
+//            }
+//        })
+        binding.tvCategoriesName.text = arguments?.getString(StartCollectionFragment.ARG_NAME)?.let{
+             it
+        }?: resources.getString(R.string.liveCategories)
+
         categoriesAdapter = WallpaperCategoriesAdapter({l, n ->
             getAllWalls(l, n)
         },
@@ -75,12 +99,45 @@ class WallCategoriesFragment : Fragment() {
         }
         arguments?.getString(StartCollectionFragment.ARG_LINK)?.let {
             viewModel.getCategories(it)
-        }
+        } ?: viewModel.getCategories(AppUtils.createFullLink(AppUtils.liveWallpaperUrl))
+
         binding.ibBackCategories.setOnClickListener {
             activity?.onBackPressed()
         }
     }
+    private fun loadAds(count: Int){
+        Log.i("WallpaperCategory", "loadAds count $count")
+        nativeAds.forEach {
+            it.destroy()
+        }
+        val builder = AdLoader.Builder(requireContext(), BuildConfig.AD_MOB_KEY)
+            .forNativeAd { nativeAd ->
+                Log.i("WallpaperCategory", "native ad $nativeAd")
+                if(isDetached){
+                    nativeAd.destroy()
+                    return@forNativeAd
+                }
 
+                nativeAds.add(nativeAd)
+                categoriesAdapter?.setNativeAd(nativeAd)
+            }
+            .withAdListener(object : AdListener(){
+                override fun onAdLoaded() {
+                    super.onAdLoaded()
+
+                    Log.i("WallpaperCategory", "onAdLoaded")
+                }
+
+                override fun onAdFailedToLoad(p0: LoadAdError) {
+
+                    Log.i("WallpaperCategory", "nativeAd failed ${p0.message}")
+                }
+            })
+            .build()
+        val request = AdRequest.Builder()
+            .build()
+        builder.loadAds(request, count)
+    }
     private fun openWallpaper(it: Wallpaper) {
         startActivity(
             WallpaperActivity.getIntent(
@@ -105,6 +162,7 @@ class WallCategoriesFragment : Fragment() {
                 adCount++
             }
         }
+        loadAds(list.size/Constants.AD_FREQUENCY_CATEGORIES)
         categoriesAdapter?.setList(list)
     }
 
@@ -113,5 +171,13 @@ class WallCategoriesFragment : Fragment() {
             putString(StartCollectionFragment.ARG_NAME, name)
             putString(StartCollectionFragment.ARG_LINK, link)
         })
+    }
+
+    override fun onDestroy() {
+        nativeAds.forEach {
+            it.destroy()
+        }
+
+        super.onDestroy()
     }
 }

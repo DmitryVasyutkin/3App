@@ -18,9 +18,14 @@
         android:id="@+id/rl_wallpaper_saved_advertisiing"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone">
+        android:visibility="visible">
 
-        <include layout="@layout/layout_ad_success_saving"/>
+        <FrameLayout
+            android:id="@+id/ad_view_wallpaper_saved"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"/>
+
         <ImageButton
             android:id="@+id/ibCloseSuccessSaving"
             android:layout_width="wrap_content"

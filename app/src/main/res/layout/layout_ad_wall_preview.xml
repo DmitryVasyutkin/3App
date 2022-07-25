@@ -13,14 +13,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <ImageButton
-            android:id="@+id/ib_close_ad_wall_preview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_baseline_close_18"
-            android:background="@android:color/transparent"
-            android:layout_gravity="end"
-            android:foreground="?attr/selectableItemBackground"/>
+
 
         <LinearLayout
             android:layout_width="match_parent"

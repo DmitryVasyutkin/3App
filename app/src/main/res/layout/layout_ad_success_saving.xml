@@ -3,10 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingBottom="30dp">
+    android:layout_height="wrap_content">
 
-    <RelativeLayout
+    <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -16,9 +15,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/ad_app_icon_success"
+            android:layout_marginStart="20dp"
             android:text="@string/loremipsum"
-            android:textSize="16sp"
-            android:layout_marginStart="20dp"/>
+            android:textSize="16sp" />
 
         <ImageView
             android:id="@+id/ad_app_icon_success"
@@ -42,6 +41,6 @@
             android:text="@string/install"
             app:backgroundTint="@null" />
 
-    </RelativeLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </com.google.android.gms.ads.nativead.NativeAdView>

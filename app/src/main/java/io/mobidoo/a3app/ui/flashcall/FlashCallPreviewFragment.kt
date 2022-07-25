@@ -1,18 +1,37 @@
 package io.mobidoo.a3app.ui.flashcall
 
+import android.Manifest
+import android.app.Activity
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.role.RoleManager
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Context.ROLE_SERVICE
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.media.AudioAttributes
+import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
+import android.telecom.InCallService
+import android.telecom.TelecomManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
 import android.widget.RemoteViews
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -22,36 +41,49 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import io.mobidoo.a3app.R
 import io.mobidoo.a3app.databinding.FragmentFlashCallPreviewBinding
-import io.mobidoo.a3app.databinding.FragmentWallpaperPreviewBinding
 import io.mobidoo.a3app.ui.FlashCallPreviewActivity
-import io.mobidoo.a3app.ui.WallpaperActivity
-import io.mobidoo.a3app.ui.wallpaperpreview.WallpaperPreviewFragment
-import io.mobidoo.a3app.utils.AppUtils
+import io.mobidoo.a3app.ui.bottomsheet.AllowChangeSettingsPermissions
+import io.mobidoo.a3app.ui.ringtone.RingtoneCategoryItemsFragment
+import io.mobidoo.a3app.ui.wallpaperpreview.WallpaperPreviewSuccessFragment
+import io.mobidoo.a3app.utils.*
 import io.mobidoo.a3app.utils.AppUtils.createFullLink
-import io.mobidoo.a3app.utils.FileDownloaderListener
-import io.mobidoo.a3app.utils.MediaLoadManager
+import io.mobidoo.a3app.utils.Constants.APP_PREFS
+import io.mobidoo.a3app.utils.Constants.SP_FLASH_CAL_URI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
+
 
 class FlashCallPreviewFragment : Fragment() {
     companion object{
+        const val TAG= "FlashCallPreviewFragment"
         private const val CHANNEL_ID = "6667"
         private const val channelName = "download_notification_channel"
         private const val DOWNLOAD_NOTIFICATION_CHANNEL_ID = "download_notification_channel_id"
         private const val DOWNLOAD_NOTIFICATION_ID = 8888
         const val TYPE_STATIC = 0
         const val TYPE_LIVE = 1
+        private val PERMISSION_SYSTEM_SETTINGS = Manifest.permission.WRITE_SETTINGS
+        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.ANSWER_PHONE_CALLS, Manifest.permission.READ_CALL_LOG, Manifest.permission.READ_PHONE_STATE)
     }
+
+    private val REQUEST_CODE_SET_DEFAULT_DIALER: Int = 3335
+    private val REQUEST_CODE_WRITE_SETTINGS: Int = 3337
     private var _binding: FragmentFlashCallPreviewBinding? = null
     private val binding get() = _binding!!
 
     private var link =""
     private var categoryName = ""
 
+    private var flashCallUri = ""
+    private var flashCallLoaded = false
+    private var systemSettingsOpened = false
+
     private lateinit var downloadManager: MediaLoadManager
     private lateinit var exoPlayer: ExoPlayer
-
+    private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
+    private lateinit var requestPermissionLauncher2: ActivityResultLauncher<String>
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -66,17 +98,19 @@ class FlashCallPreviewFragment : Fragment() {
         link = requireActivity().intent?.extras?.getString(FlashCallPreviewActivity.EXTRA_WALLPAPER_LINK).toString()
         categoryName = requireActivity().intent?.extras?.getString(FlashCallPreviewActivity.EXTRA_CATEGORY_NAME).toString()
         initializePlayer()
-        Log.i("WallpaperActionFragment", "flash call link ${createFullLink(link)}")
+
         downloadManager = MediaLoadManager(requireContext().contentResolver, resources,
             object : FileDownloaderListener {
                 override suspend fun success(path: String) {
                     withContext(Dispatchers.Main){
+                        flashCallUri =path
+                        flashCallLoaded = true
                         handleSuccessSaving()
                     }
                 }
 
                 override fun error(message: String) {
-                    Log.i("WallpaperActionFragment", "file not loaded with: $message")
+                    Log.i(TAG, "file not loaded with: $message")
                 }
             })
         setTopInset(view)
@@ -84,7 +118,126 @@ class FlashCallPreviewFragment : Fragment() {
             activity?.finish()
         }
         binding.ibDownloadFlashPreview.setOnClickListener {
-            downloadWallpaper(createFullLink(link), categoryName)
+            if (permissionAllowed(REQUIRED_PERMISSIONS[0])
+                && permissionAllowed(REQUIRED_PERMISSIONS[1])
+                && permissionAllowed(REQUIRED_PERMISSIONS[2])
+                && permissionAllowed(REQUIRED_PERMISSIONS[3])){
+                Log.i(TAG, "button downloadWallpaper")
+                downloadWallpaper(createFullLink(link), categoryName)
+            }else{
+                val notAllowed = REQUIRED_PERMISSIONS.filter { !permissionAllowed(it) }
+                requestPermissionLauncher.launch(notAllowed.toTypedArray())
+            }
+        }
+//        if(flashCallLoaded){
+//            startActivity(Intent(ACTION_SHOW_CALL_SETTINGS))
+//        }
+        requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){ isGranted ->
+            Log.i(TAG, "isGraned Map $isGranted")
+            if (!isGranted.containsValue(false)){
+                Log.i(TAG, "launch downloadWallpaper")
+                downloadWallpaper(createFullLink(link), categoryName)
+
+            }else{
+
+            }
+        }
+        requestPermissionLauncher2 = registerForActivityResult(ActivityResultContracts.RequestPermission()){isGranted ->
+            if (isGranted){
+
+                setDefualtRingtoneAndShowAd()
+
+            }else{
+                when{
+                    shouldShowRequestPermissionRationale(PERMISSION_SYSTEM_SETTINGS) -> {
+
+                        val fr = AllowChangeSettingsPermissions(){
+                            startActivityForResult(
+                                Intent(
+                                    Settings.ACTION_MANAGE_WRITE_SETTINGS,
+                                    Uri.parse("package:" + requireContext().packageName)
+                                ), REQUEST_CODE_WRITE_SETTINGS
+                            )
+                        }
+                        fr.show(activity?.supportFragmentManager?.beginTransaction()!!, "allow_permissions")
+                    }
+                    else -> {
+                        try{
+                            setDefualtRingtoneAndShowAd()
+                        }catch (e: Exception){
+
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setDefualtRingtoneAndShowAd() {
+        try {
+            RingtoneManager.setActualDefaultRingtoneUri(requireContext(), RingtoneManager.TYPE_RINGTONE, Uri.parse("android.resource://io.mobidoo.a3app/raw/five_seconds_of_silence"))
+            Log.e("FlashCallFragment", "ringtone silent")
+        }catch (e: Exception){
+            Log.e("FlashCallFragment", "exc $e")
+        }
+        openAdFragment()
+    }
+
+    override fun shouldShowRequestPermissionRationale(permission: String): Boolean {
+        return !Settings.System.canWrite(requireContext())
+    }
+    private fun systemPermissionsGranted() = Settings.System.canWrite(requireContext())
+
+    private fun setAsDefaultCaller(){
+        val sharedPreferences = activity?.getSharedPreferences(APP_PREFS, Activity.MODE_PRIVATE)!!
+        with(sharedPreferences.edit()){
+            putString(SP_FLASH_CAL_URI, flashCallUri)
+            commit()
+        }
+        if (isQPlus()) {
+            val roleManager = activity?.getSystemService(RoleManager::class.java)
+            if (roleManager!!.isRoleAvailable(RoleManager.ROLE_DIALER) && !roleManager.isRoleHeld(RoleManager.ROLE_DIALER)) {
+                val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_DIALER)
+                Log.i(TAG, "role intent $intent")
+                startActivityForResult(intent, REQUEST_CODE_SET_DEFAULT_DIALER)
+            }else{
+                if (systemPermissionsGranted()){
+                    setDefualtRingtoneAndShowAd()
+                }else{
+                    requestPermissionLauncher2.launch(PERMISSION_SYSTEM_SETTINGS)
+                }
+            }
+        } else {
+            Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER).putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, activity?.packageName).apply {
+                try {
+                    startActivityForResult(this, REQUEST_CODE_SET_DEFAULT_DIALER)
+                } catch (e: ActivityNotFoundException) {
+                    // toast(R.string.no_app_found)
+                } catch (e: Exception) {
+                    // showErrorToast(e)
+                }
+            }
+        }
+
+
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == REQUEST_CODE_SET_DEFAULT_DIALER){
+            if (resultCode == Activity.RESULT_OK){
+                Toast.makeText(requireContext(), "Flash call installed", Toast.LENGTH_SHORT).show()
+            }
+            if (systemPermissionsGranted()){
+                setDefualtRingtoneAndShowAd()
+            }else{
+                requestPermissionLauncher2.launch(PERMISSION_SYSTEM_SETTINGS)
+            }
+        }
+        if (requestCode == REQUEST_CODE_WRITE_SETTINGS){
+            setDefualtRingtoneAndShowAd()
         }
     }
 
@@ -104,8 +257,29 @@ class FlashCallPreviewFragment : Fragment() {
     }
 
     private fun handleSuccessSaving() {
-        findNavController().navigate(R.id.action_flashCallPreviewFragment_to_wallpaperPreviewSuccessFragment2)
-        NotificationManagerCompat.from(requireContext()).cancel(DOWNLOAD_NOTIFICATION_ID)
+
+        try {
+
+       //     NotificationManagerCompat.from(requireContext()).cancel(DOWNLOAD_NOTIFICATION_ID)
+            binding.rlLoadingFlashcall.visibility = View.GONE
+            exoPlayer.pause()
+            setAsDefaultCaller()
+        }catch (e: Exception){
+
+        }finally {
+
+        }
+    }
+
+    private fun openAdFragment(){
+        findNavController().navigate(
+            R.id.action_flashCallPreviewFragment_to_wallpaperPreviewSuccessFragment2,
+            Bundle().apply {
+                putString(
+                    WallpaperPreviewSuccessFragment.ARG_SAVED_VALUE,
+                    resources.getString(R.string.flashCall)
+                )
+            })
     }
 
     private fun initializePlayer() {
@@ -126,7 +300,8 @@ class FlashCallPreviewFragment : Fragment() {
     }
 
     private fun downloadWallpaper(link: String, subFolder: String){
-        showDownloadNotification()
+      //  showDownloadNotification()
+        binding.rlLoadingFlashcall.visibility = View.VISIBLE
         lifecycleScope.launch {
             downloadManager.downloadLiveWallpaper(link, subFolder, true)
         }
@@ -134,7 +309,9 @@ class FlashCallPreviewFragment : Fragment() {
 
     private fun showDownloadNotification(){
         NotificationManagerCompat.from(requireContext()).cancel(DOWNLOAD_NOTIFICATION_ID)
-        createNotificationChannel(CHANNEL_ID, channelName, "notification for download flash call")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel(CHANNEL_ID, channelName, "notification for download flash call")
+        }
         val notificationLayout = RemoteViews(activity?.packageName, R.layout.notification_download_wallpaper)
         val notificationBuilder =
             NotificationCompat.Builder(requireContext(), CHANNEL_ID)
@@ -147,6 +324,7 @@ class FlashCallPreviewFragment : Fragment() {
         notificationCompat.notify(DOWNLOAD_NOTIFICATION_ID, notification)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(id: String, name: String, channelDescription: String){
         val notificationManager = activity?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val importance = NotificationManager.IMPORTANCE_DEFAULT
@@ -155,6 +333,31 @@ class FlashCallPreviewFragment : Fragment() {
         }
         notificationManager.createNotificationChannel(chanel)
     }
+
+    private fun permissionAllowed(perm: String) = ContextCompat.checkSelfPermission(requireContext(), perm) == PackageManager.PERMISSION_GRANTED
+
+
+    fun launchSetDefaultDialerIntent() {
+        if (isQPlus()) {
+            val roleManager = activity?.getSystemService(RoleManager::class.java)
+            if (roleManager!!.isRoleAvailable(RoleManager.ROLE_DIALER) && !roleManager.isRoleHeld(RoleManager.ROLE_DIALER)) {
+                val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_DIALER)
+                Log.i(TAG, "role intent $intent")
+                startActivityForResult(intent, REQUEST_CODE_SET_DEFAULT_DIALER)
+            }
+        } else {
+            Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER).putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, activity?.packageName).apply {
+                try {
+                    startActivityForResult(this, REQUEST_CODE_SET_DEFAULT_DIALER)
+                } catch (e: ActivityNotFoundException) {
+                   // toast(R.string.no_app_found)
+                } catch (e: Exception) {
+                   // showErrorToast(e)
+                }
+            }
+        }
+    }
+
 
     override fun onDestroyView() {
         exoPlayer.stop()

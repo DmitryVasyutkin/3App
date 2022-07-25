@@ -38,7 +38,6 @@ class StartFlashCallsAdapters(
 
     inner class FlashCallViewHolder(private val binding: ItemCollectionFlashcallBinding) : RecyclerView.ViewHolder(binding.root){
         fun onBind(item: Wallpaper){
-            Log.i("RvAdapter", "flash holder")
             binding.ivFlashCallPreview.load(AppUtils.createFullLink(item.previewUrl))
             binding.cvFlashCallRecyclerItem.setOnClickListener {
                 onItemClick(item.url)

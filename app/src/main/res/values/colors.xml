@@ -12,5 +12,9 @@
     <color name="collectionBackground">#272533</color>
     <color name="shimmerBackground">#B3B3B3</color>
     <color name="whiteAlpha4">#66FFFFFF</color>
+    <color name="blackAlpha">#404040</color>
     <color name="audioControls">#3C0058</color>
+    <color name="bottombarcolor">#474747</color>
+    <color name="red">#FF0000</color>
+    <color name="green">#1A9C0B</color>
 </resources>

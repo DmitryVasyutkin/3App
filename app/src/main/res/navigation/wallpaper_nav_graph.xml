@@ -12,11 +12,19 @@
         <argument android:name="link"
             app:argType="string" />
         <action
-            android:id="@+id/action_wallpaperActionFragment_to_wallpaperPreviewSuccessFragment"
-            app:destination="@id/wallpaperPreviewSuccessFragment" />
+            android:id="@+id/action_wallpaperActionFragment_to_installWallpaperFragment"
+            app:destination="@id/installWallpaperFragment" />
     </fragment>
     <fragment
         android:id="@+id/wallpaperPreviewSuccessFragment"
         android:name="io.mobidoo.a3app.ui.wallpaperpreview.WallpaperPreviewSuccessFragment"
         android:label="WallpaperPreviewSuccessFragment" />
+    <fragment
+        android:id="@+id/installWallpaperFragment"
+        android:name="io.mobidoo.a3app.ui.wallpaperpreview.InstallWallpaperFragment"
+        android:label="InstallWallpaperFragment" >
+        <action
+            android:id="@+id/action_installWallpaperFragment_to_wallpaperPreviewSuccessFragment"
+            app:destination="@id/wallpaperPreviewSuccessFragment" />
+    </fragment>
 </navigation>

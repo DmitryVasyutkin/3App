@@ -6,7 +6,9 @@
         <entry key="..\:/Users/f52Hz/.gradle/caches/transforms-3/f585e4d114064d6bc5ba893e1ed13d31/transformed/exoplayer-ui-2.18.0/res/drawable-anydpi-v21/exo_icon_pause.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/app_logo.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/bg_black_circle_share.xml" value="0.224" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/bg_call_activity_gradient.xml" value="0.2175" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/bg_common_shimmer.xml" value="0.224" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/bg_incoming_call_placeholder.xml" value="0.2175" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/bg_pause_button.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/bg_seekbar_audio_controls.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/bg_seekbar_dark_blue.xml" value="0.224" />
@@ -15,15 +17,23 @@
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/dr_share_circle_transp.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/dr_share_circle_transp_blue.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/dr_share_flash.xml" value="0.224" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/drawable_check_round_blue.xml" value="0.224" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/drawable_circle_progress.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/drawable_flash_call_volume.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/drawable_splash_2.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/gradient_violet.xml" value="0.224" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_add_call_vector.xml" value="0.2175" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_arrow_forward.xml" value="0.2725" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_baseline_arrow_forward_24.xml" value="0.2725" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_baseline_call_24.xml" value="0.224" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_baseline_call_end_24.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_baseline_close_18.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_baseline_close_24.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_baseline_download_24.xml" value="0.224" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_baseline_mic_24.xml" value="0.2175" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_baseline_mic_off_24.xml" value="0.2175" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_baseline_pause_24.xml" value="0.224" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_baseline_play_arrow_24.xml" value="0.2175" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_bottom_view_collection.xml" value="0.264" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_bottom_view_collection_normal.xml" value="0.264" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_bottom_view_collection_selector.xml" value="0.264" />
@@ -36,9 +46,22 @@
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_bottom_view_ringtone.xml" value="0.264" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_bottom_view_ringtone_selected.xml" value="0.264" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_bottom_view_ringtone_selector.xml" value="0.168" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_call_accept.xml" value="0.2175" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_call_decline.xml" value="0.1935" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_call_keypad.xml" value="0.2175" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_call_merge_vector.xml" value="0.2175" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_call_split_vector.xml" value="0.2175" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_call_swap_vector.xml" value="0.2175" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_download_ringtone.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_download_wallpaper.xml" value="0.224" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_hold_call.xml" value="0.2175" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_launcher_background.xml" value="0.2175" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_microphone_off_vector.xml" value="0.2175" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_outline_settings_24.xml" value="0.2725" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_pause_crossed.xml" value="0.2175" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_phone_down_red_vector.xml" value="0.1935" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_phone_down_vector.xml" value="0.2175" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_phone_green_vector.xml" value="0.1935" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_play_ringtone.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_ringtone_action.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_set_as_alarm_ringtone.xml" value="0.224" />
@@ -46,30 +69,50 @@
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_set_as_ringtone.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_set_contact_ringtone.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_setting_permission_dialog.xml" value="0.224" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_settings_clear_cache.xml" value="0.274" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_settings_invite.xml" value="0.274" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_settings_privacy.xml" value="0.274" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_settings_rateus.xml" value="0.274" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_settings_support.xml" value="0.274" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_settings_use_conditions.xml" value="0.274" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_share_wallpaper.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_show_preview.xml" value="0.224" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_speaker_off_vector.xml" value="0.2175" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_speaker_on_vector.xml" value="0.2175" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_speaker_on_vektor.xml" value="0.2175" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/ic_success_ringtone.xml" value="0.224" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/shortcut_dialpad.xml" value="0.1935" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/some_drawable_preview.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/splash_text1.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/drawable/thumb_seekbar_darkblue.xml" value="0.224" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/font/sfui.xml" value="0.3927083333333333" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/font/ubuntu.xml" value="0.3927083333333333" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/activity_call.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/activity_contact_picker.xml" value="0.3625" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/activity_dialpad.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/activity_flash_call_preview.xml" value="0.3484375" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/activity_greeting.xml" value="0.3625" />
-        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/activity_main.xml" value="0.3625" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/activity_incomming_calls_handler.xml" value="0.3625" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/activity_ringtone_category_items.xml" value="0.3625" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/activity_settings.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/activity_splash.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/activity_wallpaper.xml" value="0.3625" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/call_notification.xml" value="0.33" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/dialog_allow_settings_permissions.xml" value="0.3625" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/dialog_ringtone_downloaded.xml" value="0.25" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/dialog_select_wallapper_destination.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/exo_playback_control_view_layout.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_flash_call_preview.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_flashcalls.xml" value="0.3625" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_install_wallpaper.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_live_wallpapers.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_ringtone_actions.xml" value="0.33" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_ringtone_category_items.xml" value="0.33" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_ringtones.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_selected_category_wallpapers.xml" value="0.3625" />
-        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_start_collection.xml" value="0.2971818958155423" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_settings_main.xml" value="0.33" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_start_collection.xml" value="0.33" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_wallpaper_action.xml" value="0.33" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_wallpaper_categories.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/fragment_wallpaper_preview.xml" value="0.3625" />
@@ -85,13 +128,16 @@
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/item_wallpaper_recycler.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/layout_ad_collections.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/layout_ad_ringtones.xml" value="0.3625" />
-        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/layout_ad_splash.xml" value="0.3625" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/layout_ad_splash.xml" value="0.22" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/layout_ad_success_saving.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/layout_ad_wall_preview.xml" value="0.3625" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/layout_dialpad.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/layout_greeting.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/layout_greeting_see_again.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/layout_greeting_welcome.xml" value="0.3625" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/layout_incomming_flash_call.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/layout_successfull_saving.xml" value="0.3625" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/layout_wall_category_ad.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/layout_wallpaper_saved.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/layout_welcome.xml" value="0.25" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/notification_download_wallpaper.xml" value="0.3625" />
@@ -100,6 +146,9 @@
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/shimmer_layout_ringtone_categories_item.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/layout/shimmer_layout_wallpapers_item.xml" value="0.3625" />
         <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/menu/nav_menu.xml" value="0.33" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.2175" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.2175" />
+        <entry key="..\:/Users/f52Hz/AndroidStudioProjects/3App/app/src/main/res/xml/live_wall_recource.xml" value="0.3625" />
       </map>
     </option>
   </component>

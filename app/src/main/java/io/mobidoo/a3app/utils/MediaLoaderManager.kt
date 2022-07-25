@@ -18,6 +18,8 @@ import kotlinx.coroutines.withContext
 import java.io.*
 import java.net.URL
 import java.net.URLConnection
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MediaLoadManager(
     private val contentResolver: ContentResolver,
@@ -271,6 +273,36 @@ class MediaLoadManager(
             IOUtils.closeQuietly(output)
         }
     }
+
+    suspend fun extractAudio(context: Context, videoUri: String, action: (String) -> Unit){
+        val destPath = ringFile(context).path
+        try{
+
+            val videoFd = contentResolver.openFileDescriptor(Uri.parse(videoUri), "w")?.fileDescriptor
+            AudioUtils().genVideoUsingMuxer(videoFd, destPath, -1, -1, true, false)
+        }catch (e: Exception){
+            Log.e("MediaLoaderManager", "exc $e")
+        }finally {
+            withContext(Dispatchers.Main){
+                destPath.let { action(it) }
+            }
+
+        }
+    }
+    private fun outputDir(context: Context) : File {
+
+        val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
+            File(it, context.resources.getString(R.string.app_name)).apply { mkdirs() } }
+        return if (mediaDir != null && mediaDir.exists())
+            mediaDir else context.filesDir
+    }
+
+    fun ringFile(context: Context) =
+        File(outputDir(context),
+            SimpleDateFormat(
+                "yyyy-MM-dd-HH-mm-ss-SSS", Locale.US
+            ).format(System.currentTimeMillis()) + ".mp3"
+        )
 
 }
 fun String.getFileName() : String{

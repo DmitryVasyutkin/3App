@@ -14,7 +14,7 @@
         android:layout_marginTop="10dp">
 
         <TextView
-            android:id="@+id/ad_headline"
+            android:id="@+id/ad_headline_collections"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -24,18 +24,18 @@
             android:textSize="16sp" />
 
         <ImageView
-            android:id="@+id/ad_app_icon"
+            android:id="@+id/ad_app_icon_collections"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            android:layout_below="@+id/ad_headline"
+            android:layout_below="@+id/ad_headline_collections"
             android:background="@color/mainBackGround"
             android:scaleType="fitXY" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnNativeAdAction"
+            android:id="@+id/btnNativeAdAction_collections"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/ad_app_icon"
+            android:layout_below="@+id/ad_app_icon_collections"
             android:background="@color/collectionBackground"
             android:drawableEnd="@drawable/ic_baseline_arrow_forward_24"
             android:foreground="?attr/selectableItemBackground"

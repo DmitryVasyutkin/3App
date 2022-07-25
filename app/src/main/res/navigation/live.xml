@@ -4,8 +4,21 @@
     android:id="@+id/live"
     app:startDestination="@id/liveWallpaperFragment2">
 
+<!--    <fragment-->
+<!--        android:id="@+id/liveWallpaperFragment2"-->
+<!--        android:name="io.mobidoo.a3app.ui.livewall.LiveWallpaperFragment"-->
+<!--        android:label="LiveWallpaperFragment" />-->
     <fragment
         android:id="@+id/liveWallpaperFragment2"
-        android:name="io.mobidoo.a3app.ui.livewall.LiveWallpaperFragment"
-        android:label="LiveWallpaperFragment" />
+        android:name="io.mobidoo.a3app.ui.startfragment.WallCategoriesFragment"
+        android:label="WallCategoriesFragment" >
+        <action
+            android:id="@+id/action_wallCategoriesFragment_to_selectedCategoryWallpapersFragment"
+            app:destination="@id/selectedCategoryWallpapersFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/selectedCategoryWallpapersFragment"
+        android:name="io.mobidoo.a3app.entity.startcollectionitem.SelectedCategoryWallpapersFragment"
+        android:label="SelectedCategoryWallpapersFragment" />
 </navigation>

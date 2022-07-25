@@ -1,23 +1,30 @@
 package io.mobidoo.a3app.utils
 
 import android.app.Activity
+import android.app.WallpaperManager
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.RelativeLayout
+import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.mobidoo.a3app.BuildConfig
 import io.mobidoo.a3app.R
 import io.mobidoo.a3app.entity.startcollectionitem.SelectedCategoryWallpapersFragment
+import io.mobidoo.a3app.services.LiveWallpaperService
 import io.mobidoo.a3app.ui.wallpaperpreview.WallpaperPreviewFragment
 
 object AppUtils {
     val flashCallSubsUrl = "/api/r3/wallpapers/live/6"
+    val liveWallpaperUrl = "/api/r3/live/"
     private val videoFormats = setOf<String>("mp4", "m4a", "webM", "fmp4", "mpeg")
     fun isNetworkAvailable(context: Context?):Boolean{
         if (context == null) return false
@@ -101,5 +108,24 @@ object AppUtils {
         val format = link.split("/").last().split(".").last()
         return if (videoFormats.contains(format)) WallpaperPreviewFragment.TYPE_LIVE
         else WallpaperPreviewFragment.TYPE_STATIC
+    }
+
+    fun Fragment.startWallpaperService(uri: String) {
+        val shp = requireContext().getSharedPreferences("APP_PREFS", Activity.MODE_PRIVATE)
+        with(shp.edit()) {
+            putString(LiveWallpaperService.PREFERENCES_WAL_URI, uri)
+            commit()
+        }
+        try {
+            val cn = ComponentName(requireActivity(), LiveWallpaperService::class.java)
+            val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, cn)
+            }
+
+            startActivity(intent)
+        } catch (e: Exception) {
+            Log.i("InstallWallpaper", "inst exc $e")
+        }
     }
 }

@@ -75,9 +75,9 @@
                         android:text="@string/flash_calls"
                         android:textSize="16sp" />
 
-                    <com.google.android.material.button.MaterialButton
+                    <Button
                         android:id="@+id/btnSeeAllFlash"
-                        style="@style/Widget.Material3.Button.TextButton"
+                        android:backgroundTint="@color/collectionBackground"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -86,6 +86,7 @@
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
                         android:text="@string/see_all"
+                        android:textColor="@color/white"
                         android:textSize="14sp" />
 
                 </RelativeLayout>
@@ -141,9 +142,9 @@
                         android:text="@string/live_"
                         android:textSize="16sp" />
 
-                    <com.google.android.material.button.MaterialButton
+                    <Button
                         android:id="@+id/btnSeeAllLive"
-                        style="@style/Widget.Material3.Button.TextButton"
+                        android:backgroundTint="@color/collectionBackground"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -152,6 +153,7 @@
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
                         android:text="@string/see_all"
+                        android:textColor="@color/white"
                         android:textSize="14sp" />
 
                 </RelativeLayout>
@@ -211,9 +213,9 @@
                         android:text="@string/new_"
                         android:textSize="16sp" />
 
-                    <com.google.android.material.button.MaterialButton
+                    <Button
                         android:id="@+id/btnSeeAllNew"
-                        style="@style/Widget.Material3.Button.TextButton"
+                        android:backgroundTint="@color/collectionBackground"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
@@ -221,6 +223,7 @@
                         android:fontFamily="@font/ubuntu_bold"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
+                        android:textColor="@color/white"
                         android:text="@string/see_all"
                         android:textSize="14sp" />
 
@@ -255,7 +258,11 @@
 
             </RelativeLayout>
 
-            <include layout="@layout/layout_ad_collections"/>
+<!--            <include layout="@layout/layout_ad_collections"/>-->
+            <FrameLayout
+                android:id="@+id/ad_layout_collections1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -279,15 +286,16 @@
                         android:text="@string/allRecomendation"
                         android:textSize="16sp" />
 
-                    <com.google.android.material.button.MaterialButton
+                    <Button
                         android:id="@+id/btnSeeAllAll"
-                        style="@style/Widget.Material3.Button.TextButton"
+                        android:backgroundTint="@color/collectionBackground"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:drawableEnd="@drawable/ic_baseline_arrow_forward_24"
                         android:fontFamily="@font/ubuntu_bold"
                         android:insetTop="0dp"
+                        android:textColor="@color/white"
                         android:insetBottom="0dp"
                         android:text="@string/see_all"
                         android:textSize="14sp" />
@@ -346,15 +354,16 @@
                         android:text="@string/top100"
                         android:textSize="16sp" />
 
-                    <com.google.android.material.button.MaterialButton
+                    <Button
                         android:id="@+id/btnSeeAllPopular"
-                        style="@style/Widget.Material3.Button.TextButton"
+                        android:backgroundTint="@color/collectionBackground"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:drawableEnd="@drawable/ic_baseline_arrow_forward_24"
                         android:fontFamily="@font/ubuntu_bold"
                         android:insetTop="0dp"
+                        android:textColor="@color/white"
                         android:insetBottom="0dp"
                         android:text="@string/see_all"
                         android:textSize="14sp" />
@@ -412,14 +421,15 @@
                         android:text="@string/calm"
                         android:textSize="16sp" />
 
-                    <com.google.android.material.button.MaterialButton
+                    <Button
                         android:id="@+id/btnSeeAllCalm"
-                        style="@style/Widget.Material3.Button.TextButton"
+                        android:backgroundTint="@color/collectionBackground"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:drawableEnd="@drawable/ic_baseline_arrow_forward_24"
                         android:fontFamily="@font/ubuntu_bold"
+                        android:textColor="@color/white"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
                         android:text="@string/see_all"
@@ -456,7 +466,11 @@
 
             </RelativeLayout>
 
-            <include layout="@layout/layout_ad_collections"/>
+<!--            <include layout="@layout/layout_ad_collections"/>-->
+            <FrameLayout
+                android:id="@+id/ad_layout_collections2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -477,17 +491,19 @@
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:fontFamily="@font/ubuntu_bold"
+                        android:textColor="@color/white"
                         android:text="@string/Abstract"
                         android:textSize="16sp" />
 
-                    <com.google.android.material.button.MaterialButton
+                    <Button
                         android:id="@+id/btnSeeAllAbstract"
-                        style="@style/Widget.Material3.Button.TextButton"
+                        android:backgroundTint="@color/collectionBackground"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:drawableEnd="@drawable/ic_baseline_arrow_forward_24"
                         android:fontFamily="@font/ubuntu_bold"
+                        android:textColor="@color/white"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
                         android:text="@string/see_all"

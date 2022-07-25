@@ -7,7 +7,6 @@
     android:background="@color/black">
 
 
-
     <include layout="@layout/layout_welcome"
         android:id="@+id/layout_greeting1"
         android:layout_height="wrap_content"
@@ -26,10 +25,10 @@
         app:layout_constraintTop_toBottomOf="@+id/ibCloseGreeting"
         android:visibility="gone"/>
 
-    <include layout="@layout/layout_ad_splash"
+    <FrameLayout
+        android:id="@+id/ad_view_splash"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>

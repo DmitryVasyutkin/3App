@@ -14,7 +14,7 @@ import io.mobidoo.domain.entities.wallpaper.Wallpaper
 import java.util.*
 
 class RingtoneItemsAdapter(
-    private val onClick: (Ringtone) -> (Unit)
+    private val onClick: (Ringtone, Int) -> (Unit)
 ) :  RecyclerView.Adapter<RingtoneItemsAdapter.RingtoneViewHolder>() {
 
     private val list = arrayListOf<Ringtone>()
@@ -40,7 +40,7 @@ class RingtoneItemsAdapter(
     }
 
     override fun onBindViewHolder(holder: RingtoneItemsAdapter.RingtoneViewHolder, position: Int) {
-        holder.onBind(list[position])
+        holder.onBind(list[position], position)
     }
 
     override fun getItemCount(): Int {
@@ -49,7 +49,7 @@ class RingtoneItemsAdapter(
 
     inner class RingtoneViewHolder(private val binding: ItemRingtoneStartCollectionBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun onBind(item: Ringtone) {
+        fun onBind(item: Ringtone, position: Int) {
 
             binding.ivRingtoneStartItem.load(createFullLink(item.imageUrl))
             binding.tvRingtoneTitleStart.text = item.title.replaceFirstChar {
@@ -58,7 +58,7 @@ class RingtoneItemsAdapter(
                 ) else it.toString()
             }
             binding.cvRingtoneStartItem.setOnClickListener{
-                onClick(item)
+                onClick(item, position)
             }
         }
     }

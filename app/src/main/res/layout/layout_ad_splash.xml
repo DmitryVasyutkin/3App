@@ -2,34 +2,34 @@
 <com.google.android.gms.ads.nativead.NativeAdView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-     >
+    >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/ad_headline"
+            android:id="@+id/ad_headline_splash"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/ad_app_icon"
+            android:layout_above="@+id/ad_app_icon_splash"
+            android:layout_marginStart="20dp"
             android:text="@string/loremipsum"
-            android:textSize="16sp"
-            android:layout_marginStart="20dp"/>
+            android:textSize="16sp" />
 
         <ImageView
-            android:id="@+id/ad_app_icon"
+            android:id="@+id/ad_app_icon_splash"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:layout_above="@+id/btnNativeAdAction"
+            android:layout_above="@+id/btnNativeAdAction_splash"
             android:background="@color/mainBackGround"
             android:scaleType="fitXY" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnNativeAdAction"
+            android:id="@+id/btnNativeAdAction_splash"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -42,6 +42,6 @@
             android:text="@string/install"
             app:backgroundTint="@null" />
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </com.google.android.gms.ads.nativead.NativeAdView>

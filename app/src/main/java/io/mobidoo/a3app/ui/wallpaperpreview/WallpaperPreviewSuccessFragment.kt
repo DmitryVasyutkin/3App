@@ -16,21 +16,25 @@ import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import io.mobidoo.a3app.BuildConfig
 import io.mobidoo.a3app.R
 import io.mobidoo.a3app.databinding.FragmentWallpaperSuccessBinding
 import io.mobidoo.a3app.databinding.LayoutAdSuccessSavingBinding
+import io.mobidoo.a3app.databinding.LayoutAdWallPreviewBinding
 import io.mobidoo.a3app.databinding.LayoutWallpaperSavedBinding
 
 class WallpaperPreviewSuccessFragment : Fragment() {
-
+    companion object{
+        const val ARG_SAVED_VALUE = "arg_saved_value"
+    }
 
     private var _binding: FragmentWallpaperSuccessBinding? = null
     private val binding get() = _binding!!
 
     private var layoutBinding: LayoutWallpaperSavedBinding? = null
-
+    private var value = ""
     private var thanksPressed = false
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,19 +50,26 @@ class WallpaperPreviewSuccessFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setInsets(view)
         loadAd()
+        value = arguments?.getString(ARG_SAVED_VALUE).toString()
+        val tvSavedValue = view.findViewById<TextView>(R.id.greeting_layoutHeader1)
+        tvSavedValue.text = String.format(resources.getString(R.string.successfullySavedWallpaper), value)
         layoutBinding?.btnThanksSuccessSaving?.setOnClickListener {
             thanksPressed = true
             showAdvertising()
         }
         binding.ibCloseSuccessSaving.setOnClickListener {
-            activity?.finish()
+            activity?.onBackPressed()
         }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     if (!thanksPressed)
                         layoutBinding?.btnThanksSuccessSaving?.performClick()
-                    else activity?.finish()
+                    else {
+                        if (value == resources.getString(R.string.flashCall))
+                            activity?.supportFragmentManager?.popBackStack()
+                        else activity?.finish()
+                    }
                 }
             }
         )
@@ -90,16 +101,25 @@ class WallpaperPreviewSuccessFragment : Fragment() {
     private fun loadAd(){
         val builder = AdLoader.Builder(requireContext(), BuildConfig.AD_MOB_KEY)
             .forNativeAd { nativeAd ->
-                val adView = layoutInflater.inflate(R.layout.layout_ad_success_saving, null) as NativeAdView
 
-                adView.findViewById<TextView>(R.id.ad_headline_success).text = nativeAd.headline
-                adView.findViewById<ImageView>(R.id.ad_app_icon_success).load(nativeAd.icon?.drawable)
-                if (thanksPressed)
-                    showAdvertising()
-                if(this.isDetached){
-                    nativeAd.destroy()
-                    return@forNativeAd
+                try {
+                    if (thanksPressed)
+                        showAdvertising()
+                    if(this.isDetached){
+                        nativeAd.destroy()
+                        return@forNativeAd
+                    }
+                    val adBinding = activity?.layoutInflater?.let {
+                        LayoutAdSuccessSavingBinding.inflate(
+                            it
+                        )
+                    }!!
+                    populateNativeAdView(nativeAd, adBinding)
+                    binding.adViewWallpaperSaved.addView(adBinding.root)
+                }catch (e: Exception){
+
                 }
+
             }
             .withAdListener(object : AdListener(){
                 override fun onAdFailedToLoad(p0: LoadAdError) {
@@ -113,6 +133,23 @@ class WallpaperPreviewSuccessFragment : Fragment() {
         builder.loadAd(request)
     }
 
+    private fun populateNativeAdView(nativeAd: NativeAd, adViewBinding: LayoutAdSuccessSavingBinding){
+        val nativeAdView = adViewBinding.root
+
+        nativeAdView.bodyView = adViewBinding.adHeadlineSuccess
+        nativeAdView.imageView = adViewBinding.adAppIconSuccess
+        nativeAdView.callToActionView = adViewBinding.btnNativeAdActionSuccess
+        adViewBinding.adHeadlineSuccess.text = nativeAd.body ?: nativeAd.headline
+
+        if (nativeAd.mediaContent != null){
+            adViewBinding.adAppIconSuccess.load(nativeAd.mediaContent?.mainImage)
+        }else{
+            adViewBinding.adAppIconSuccess.load(nativeAd.icon?.uri)
+        }
+        if(nativeAd.callToAction != null)
+            adViewBinding.btnNativeAdActionSuccess.text = nativeAd.callToAction
+
+    }
     private fun showAdvertising() {
         Log.i(this::class.simpleName, "showAdvertising")
         binding.rlWallpaperSavedAdvertisiing.visibility = View.VISIBLE

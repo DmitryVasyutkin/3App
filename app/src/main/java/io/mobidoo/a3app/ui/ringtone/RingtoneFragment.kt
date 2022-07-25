@@ -11,6 +11,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
+import io.mobidoo.a3app.BuildConfig
 import io.mobidoo.a3app.adapters.RingtoneCategoriesAdapter
 import io.mobidoo.a3app.databinding.FragmentRingtonesBinding
 import io.mobidoo.a3app.databinding.FragmentStartCollectionBinding
@@ -59,8 +64,9 @@ class RingtoneFragment : Fragment() {
         categoriesAdapter = RingtoneCategoriesAdapter({link, categName ->
             val intent = RingtoneCategoryItemsActivity.getIntent(requireActivity(), link, categName)
             startActivity(intent)
-        },{
-
+        },{link, name, ringtone, p ->
+            val intent = RingtoneCategoryItemsActivity.getIntent(requireActivity(), link, name, ringtone, p)
+            startActivity(intent)
         })
 
         binding.rvRingtoneCategories.apply {
@@ -72,13 +78,43 @@ class RingtoneFragment : Fragment() {
             viewModel.categoriesState.collect(){
                 if (!it.isLoading){
                     binding.shimmerRingtoneCategories.stop()
-                    categoriesAdapter.setList(createList(it.categories))
+                    val list = createList(it.categories)
+                    loadAds(list.size/Constants.AD_FREQUENCY_CATEGORIES)
+                    categoriesAdapter.setList(list)
                 }
             }
         }
         viewModel.getCategories()
     }
+    private fun loadAds(count: Int){
+        Log.i("RingtoneCategory", "loadAds count $count")
+        val builder = AdLoader.Builder(requireContext(), BuildConfig.AD_MOB_KEY)
+            .forNativeAd { nativeAd ->
+                Log.i("RingtoneCategory", "native ad $nativeAd")
+                if(isDetached){
+                    nativeAd.destroy()
+                    return@forNativeAd
+                }
 
+                categoriesAdapter.setNativeAd(nativeAd)
+            }
+            .withAdListener(object : AdListener(){
+                override fun onAdLoaded() {
+                    super.onAdLoaded()
+
+                    Log.i("RingtoneCategory", "onAdLoaded")
+                }
+
+                override fun onAdFailedToLoad(p0: LoadAdError) {
+
+                    Log.i("RingtoneCategory", "nativeAd failed ${p0.message}")
+                }
+            })
+            .build()
+        val request = AdRequest.Builder()
+            .build()
+        builder.loadAds(request, count)
+    }
     private fun createList(list: List<RingtoneCategory>): List<RingtoneCategoryRecyclerItem>{
         val result = arrayListOf<RingtoneCategoryRecyclerItem>()
         Log.i("RingtoneFr", "recycler LIst $result")

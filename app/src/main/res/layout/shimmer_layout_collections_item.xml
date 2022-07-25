@@ -16,7 +16,6 @@
             android:id="@+id/iv_wallpaperPreview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="fitXY"
             android:background="@color/shimmerBackground"/>
 
     </com.google.android.material.card.MaterialCardView>

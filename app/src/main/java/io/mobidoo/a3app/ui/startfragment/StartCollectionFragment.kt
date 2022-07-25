@@ -1,33 +1,46 @@
 package io.mobidoo.a3app.ui.startfragment
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.facebook.shimmer.ShimmerFrameLayout
+import com.google.android.gms.ads.*
+import com.google.android.gms.ads.initialization.InitializationStatus
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener
+import com.google.android.gms.ads.nativead.NativeAd
+import io.mobidoo.a3app.BuildConfig
 import io.mobidoo.a3app.R
 import io.mobidoo.a3app.adapters.StartFlashCallsAdapters
 import io.mobidoo.a3app.adapters.StartWallpaperCollectionsAdapter
 import io.mobidoo.a3app.databinding.FragmentStartCollectionBinding
+import io.mobidoo.a3app.databinding.LayoutAdCollectionsBinding
+import io.mobidoo.a3app.databinding.LayoutAdSplashBinding
 import io.mobidoo.a3app.di.Injector
 import io.mobidoo.a3app.entity.uistate.allcollectionstate.AllCollectionsUIState
 import io.mobidoo.a3app.ui.FlashCallPreviewActivity
 import io.mobidoo.a3app.ui.MainActivity
+import io.mobidoo.a3app.ui.SettingsActivity
 import io.mobidoo.a3app.ui.WallpaperActivity
+import io.mobidoo.a3app.utils.AppUtils.expand
 import io.mobidoo.a3app.utils.AppUtils.getWallpaperTypeFromLink
 import io.mobidoo.a3app.viewmodels.MainActivityViewModel
 import io.mobidoo.a3app.viewmodels.MainActivityViewModelFactory
 import io.mobidoo.domain.common.Constants.WALLS_HEIGHT_TO_WIDTH_DIMENSION
 import io.mobidoo.domain.entities.wallpaper.Wallpaper
 import kotlinx.coroutines.Job
+import java.util.*
 import javax.inject.Inject
 
 class StartCollectionFragment : Fragment(), View.OnClickListener {
@@ -53,7 +66,9 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
     private lateinit var popularWallsAdapter: StartWallpaperCollectionsAdapter
     private lateinit var calmWallsAdapter: StartWallpaperCollectionsAdapter
     private lateinit var abstractWallsAdapter: StartWallpaperCollectionsAdapter
-
+    private var nativeAds = arrayListOf<NativeAd>()
+    private lateinit var adViewLayout1: FrameLayout
+    private lateinit var adViewLayout2: FrameLayout
     private var uiState: AllCollectionsUIState? = null
 
     private var uiUpdatesJob: Job? = null
@@ -75,7 +90,13 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        val request = RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("34A6AF4C95E8EC517667A12EF589AB8B")).build()
+        MobileAds.setRequestConfiguration(request)
+        MobileAds.initialize(requireContext(), object: OnInitializationCompleteListener {
+            override fun onInitializationComplete(p0: InitializationStatus) {
+                loadAds()
+            }
+        })
         initializeRecyclers()
         binding.btnSeeAllLive.setOnClickListener(this)
         binding.btnSeeAllNew.setOnClickListener(this)
@@ -84,6 +105,9 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
         binding.btnSeeAllCalm.setOnClickListener(this)
         binding.btnSeeAllPopular.setOnClickListener(this)
         binding.btnSeeAllFlash.setOnClickListener(this)
+        binding.ibSettings.setOnClickListener(this)
+        adViewLayout1 = view.findViewById(R.id.ad_layout_collections1)
+        adViewLayout2 = view.findViewById(R.id.ad_layout_collections2)
         uiUpdatesJob = lifecycleScope.launchWhenResumed {
             viewModel.uiStateFlow.collect(){
                 Log.i(TAG, "uiState $it")
@@ -115,7 +139,51 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
         }
     }
 
+    private fun loadAds(){
+        nativeAds.forEach {
+            it.destroy()
+        }
+        val builder = AdLoader.Builder(requireContext(), BuildConfig.AD_MOB_KEY)
+            .forNativeAd { nativeAd ->
 
+                if(isDetached){
+                    nativeAd.destroy()
+                    return@forNativeAd
+                }
+
+                nativeAds.add(nativeAd)
+                val adBinding = activity?.layoutInflater?.let {
+                    LayoutAdCollectionsBinding.inflate(
+                        it
+                    )
+                }!!
+                populateNativeAdView(nativeAd, adBinding)
+                if(nativeAds.size == 1){
+                    adViewLayout1.removeAllViews()
+                    adViewLayout1.addView(adBinding.root)
+                }else if(nativeAds.size == 2){
+                    adViewLayout2.removeAllViews()
+                    adViewLayout2.addView(adBinding.root)
+                }
+
+            }
+            .withAdListener(object : AdListener(){
+                override fun onAdLoaded() {
+                    super.onAdLoaded()
+
+                    Log.i("StartCollections", "onAdLoaded")
+                }
+
+                override fun onAdFailedToLoad(p0: LoadAdError) {
+
+                    Log.i("StartCollections", "nativeAd failed ${p0.message}")
+                }
+            })
+            .build()
+        val request = AdRequest.Builder()
+            .build()
+        builder.loadAds(request, 3)
+    }
 
     private fun handleUIState(it: AllCollectionsUIState) {
 
@@ -203,6 +271,7 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
 
     override fun onResume() {
         super.onResume()
+        nativeAds.clear()
         viewModel.getStartCollection()
     }
 
@@ -216,14 +285,23 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
         _binding = null
     }
 
+    override fun onDestroy() {
+        nativeAds.forEach{
+            it.destroy()
+        }
+        nativeAds.clear()
+        super.onDestroy()
+    }
+
     override fun onClick(p0: View?) {
         when(p0){
             binding.btnSeeAllLive -> {
                 if(uiState?.live != null){
-                    p0.findNavController().navigate(R.id.action_startCollectionFragment_to_wallCategoriesFragment, Bundle().apply {
-                        putString(ARG_NAME, resources.getString(R.string.liveCategories))
-                        putSerializable(ARG_LINK, uiState?.live?.linkForFull)
-                    })
+//                    p0.findNavController().navigate(R.id.action_startCollectionFragment_to_wallCategoriesFragment, Bundle().apply {
+//                        putString(ARG_NAME, resources.getString(R.string.liveCategories))
+//                        putSerializable(ARG_LINK, uiState?.live?.linkForFull)
+//                    })
+                    (activity as MainActivity).navigateToLiveWalls()
                 }
             }
             binding.btnSeeAllAbstract -> {
@@ -269,7 +347,34 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
             binding.btnSeeAllFlash -> {
                 (activity as MainActivity).navigateToFlashCalls()
             }
+            binding.ibSettings -> {
+                startActivity(Intent(requireActivity(), SettingsActivity::class.java))
+            }
         }
+    }
+
+    private fun populateNativeAdView(nativeAd: NativeAd, adViewBinding: LayoutAdCollectionsBinding){
+        val nativeAdView = adViewBinding.root
+
+        nativeAdView.bodyView = adViewBinding.adHeadlineCollections
+        nativeAdView.imageView = adViewBinding.adAppIconCollections
+        nativeAdView.callToActionView = adViewBinding.btnNativeAdActionCollections
+
+        if (nativeAd.body != null){
+            adViewBinding.adHeadlineCollections.text = nativeAd.body
+        }else if(nativeAd.headline != null){
+            adViewBinding.adHeadlineCollections.text = nativeAd.headline
+        }
+
+        if (nativeAd.mediaContent != null){
+            adViewBinding.adAppIconCollections.load(nativeAd.mediaContent?.mainImage)
+        }else{
+            adViewBinding.adAppIconCollections.load(nativeAd.icon?.uri)
+        }
+
+        if (nativeAd.callToAction != null)
+            adViewBinding.btnNativeAdActionCollections.text = nativeAd.callToAction
+
     }
 }
  class HorizontalLayoutManager(context: Context, private val widthScale: Float, private val heightToWidthScale: Int) : LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false){

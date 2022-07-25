@@ -3,6 +3,7 @@ package io.mobidoo.a3app.ui.wallpaperpreview
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.content.res.Resources
 import android.icu.util.Calendar
 import android.os.*
@@ -13,6 +14,7 @@ import android.view.ViewGroup
 import android.view.WindowInsets
 import android.widget.*
 import androidx.activity.OnBackPressedCallback
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
@@ -27,13 +29,18 @@ import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.mobidoo.a3app.BuildConfig
 import io.mobidoo.a3app.R
 import io.mobidoo.a3app.databinding.FragmentWallpaperPreviewBinding
+import io.mobidoo.a3app.databinding.LayoutAdCollectionsBinding
+import io.mobidoo.a3app.databinding.LayoutAdWallPreviewBinding
 import io.mobidoo.a3app.ui.WallpaperActivity
+import io.mobidoo.a3app.utils.AppUtils
 import io.mobidoo.a3app.utils.AppUtils.createFullLink
+import io.mobidoo.a3app.utils.AppUtils.startWallpaperService
 import io.mobidoo.a3app.utils.AppUtils.toDayOfWeek
 import io.mobidoo.a3app.utils.AppUtils.toMonth
 import io.mobidoo.a3app.utils.FileDownloaderListener
@@ -63,6 +70,7 @@ class WallpaperPreviewFragment : Fragment() {
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<RelativeLayout>
     private lateinit var downloadManager: MediaLoadManager
     private lateinit var exoPlayer: ExoPlayer
+    private var currentAd: NativeAd? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -97,8 +105,17 @@ class WallpaperPreviewFragment : Fragment() {
         binding.ibBackWallpaperPreview.setOnClickListener {
             activity?.onBackPressed()
         }
+        binding.ibShareWallpaper.setOnClickListener {
+            val link = "market://details?id=" + resources.getString(R.string.app_name)
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, link)
+            }
+            startActivity(Intent.createChooser(intent, resources.getString(R.string.shareLink)))
+        }
         view.findViewById<ImageButton>(R.id.ib_close_ad_wall_preview)?.setOnClickListener {
-            binding.rlWallAdvertising.visibility = View.GONE
+               binding.rlWallAdvertisingContainer.visibility = View.GONE
+
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,object : OnBackPressedCallback(true) {
@@ -115,7 +132,7 @@ class WallpaperPreviewFragment : Fragment() {
             object : FileDownloaderListener {
                 override suspend fun success(path: String) {
                     withContext(Dispatchers.Main){
-                        handleSuccessSaving()
+                        handleSuccessSaving(path)
                     }
                 }
 
@@ -144,9 +161,20 @@ class WallpaperPreviewFragment : Fragment() {
         exoPlayer.prepare()
     }
 
-    private fun handleSuccessSaving() {
-        findNavController().navigate(R.id.action_wallpaperActionFragment_to_wallpaperPreviewSuccessFragment)
-        NotificationManagerCompat.from(requireContext()).cancel(DOWNLOAD_NOTIFICATION_ID)
+    private fun handleSuccessSaving(path: String) {
+        if (wallpaperType == TYPE_STATIC){
+            binding.rlLoadingWallpaper.visibility = View.GONE
+            findNavController().navigate(R.id.action_wallpaperActionFragment_to_installWallpaperFragment, Bundle().apply {
+                putString(InstallWallpaperFragment.ARG_WALLPAPER_URI, path)
+                putInt(InstallWallpaperFragment.ARG_WALL_TYPE, wallpaperType)
+            })
+
+          //  NotificationManagerCompat.from(requireContext()).cancel(DOWNLOAD_NOTIFICATION_ID)
+        }else{
+            binding.rlLoadingWallpaper.visibility = View.GONE
+         //   NotificationManagerCompat.from(requireContext()).cancel(DOWNLOAD_NOTIFICATION_ID)
+            startWallpaperService(path)
+        }
     }
 
     private fun setInsets(view: View) {
@@ -174,18 +202,18 @@ class WallpaperPreviewFragment : Fragment() {
     }
 
     private fun showAdvertising() {
-        binding.rlWallAdvertising.visibility = View.VISIBLE
+        binding.rlWallAdvertisingContainer.visibility = View.VISIBLE
     }
 
     private fun downloadWallpaper(link: String, subFolder: String){
-        showDownloadNotification()
+      //  showDownloadNotification()
+        binding.rlLoadingWallpaper.visibility = View.VISIBLE
         lifecycleScope.launch {
             if(wallpaperType == TYPE_STATIC)
                 downloadManager.downloadStaticWallpaper(link, subFolder)
             else
                 downloadManager.downloadLiveWallpaper(link, subFolder, false)
         }
-
     }
 
     private fun setPreviewValues(resources: Resources){
@@ -203,12 +231,12 @@ class WallpaperPreviewFragment : Fragment() {
         if (show){
             setPreviewValues(resources)
             binding.linearLayout2.visibility = View.VISIBLE
-            binding.rlWallAdvertising.visibility = View.GONE
+            binding.rlWallAdvertisingContainer.visibility = View.GONE
             hideActions(true)
             previewShowing = true
         }else{
             binding.linearLayout2.visibility = View.GONE
-            binding.rlWallAdvertising.visibility = View.VISIBLE
+            binding.rlWallAdvertisingContainer.visibility = View.VISIBLE
             hideActions(false)
             previewShowing = false
         }
@@ -227,19 +255,23 @@ class WallpaperPreviewFragment : Fragment() {
     private fun loadAd(){
         val builder = AdLoader.Builder(requireContext(), BuildConfig.AD_MOB_KEY)
             .forNativeAd { nativeAd ->
-                val adView = layoutInflater.inflate(R.layout.layout_ad_wall_preview, null) as NativeAdView
-
-                adView.findViewById<TextView>(R.id.ad_headline_wallP).text = nativeAd.headline
-                adView.findViewById<ImageView>(R.id.ad_app_icon_wallP).load(nativeAd.icon?.drawable)
-                if (!previewShowing)
-                    showAdvertising()
-                Log.i("WallpaperActionFragment", "nativeAd $nativeAd")
+                currentAd = nativeAd
                 if(isDetached){
                     nativeAd.destroy()
                     return@forNativeAd
                 }
+                val adBinding = LayoutAdWallPreviewBinding.inflate(activity?.layoutInflater!!)
+                populateNativeAdView(nativeAd, adBinding)
+                binding.flWallAdvertising.removeAllViews()
+                binding.flWallAdvertising.addView(adBinding.root)
             }
             .withAdListener(object : AdListener(){
+                override fun onAdLoaded() {
+                    super.onAdLoaded()
+                    showAdvertising()
+                    Log.i("WallpaperActionFragment", "onAdLoaded")
+                }
+
                 override fun onAdFailedToLoad(p0: LoadAdError) {
                     if (!previewShowing)
                         showAdvertising()
@@ -249,13 +281,33 @@ class WallpaperPreviewFragment : Fragment() {
             .build()
         val request = AdRequest.Builder()
             .build()
-        Log.i("WallpaperActionFragment", "is Test device ${request.isTestDevice(requireContext())}")
-        builder.loadAds(request, 10)
+        builder.loadAd(request)
     }
+    private fun populateNativeAdView(nativeAd: NativeAd, adViewBinding: LayoutAdWallPreviewBinding){
+        val nativeAdView = adViewBinding.root
 
+        nativeAdView.bodyView = adViewBinding.adHeadlineWallP
+        nativeAdView.iconView = adViewBinding.adAppIconWallP
+        nativeAdView.callToActionView = adViewBinding.btnNativeAdWallPreviewAction
+
+        if (nativeAd.body != null){
+            adViewBinding.adHeadlineWallP.text = nativeAd.body
+        }else if (nativeAd.headline != null){
+            adViewBinding.adHeadlineWallP.text = nativeAd.headline
+        }
+
+        nativeAd.icon?.uri?.let {
+            adViewBinding.adAppIconWallP.load(it)
+        }
+        if(nativeAd.callToAction != null)
+            adViewBinding.btnNativeAdWallPreviewAction.text = nativeAd.callToAction
+
+    }
     private fun showDownloadNotification(){
         NotificationManagerCompat.from(requireContext()).cancel(DOWNLOAD_NOTIFICATION_ID)
-        createNotificationChannel(CHANNEL_ID, channelName, "notification for download wallpapers")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            createNotificationChannel(CHANNEL_ID, channelName, "notification for download wallpapers")
+        }
         val notificationLayout = RemoteViews(activity?.packageName, R.layout.notification_download_wallpaper)
         val notificationBuilder =
             NotificationCompat.Builder(requireContext(), CHANNEL_ID)
@@ -268,6 +320,7 @@ class WallpaperPreviewFragment : Fragment() {
         notificationCompat.notify(DOWNLOAD_NOTIFICATION_ID, notification)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel(id: String, name: String, channelDescription: String){
         val notificationManager = activity?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val importance = NotificationManager.IMPORTANCE_DEFAULT
@@ -281,6 +334,7 @@ class WallpaperPreviewFragment : Fragment() {
         if(wallpaperType == TYPE_LIVE){
             if(this::exoPlayer.isInitialized) exoPlayer.release()
         }
+        currentAd?.destroy()
 
         super.onDestroy()
     }

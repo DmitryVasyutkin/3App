@@ -28,6 +28,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:menu="@menu/nav_menu"
-        app:labelVisibilityMode="unlabeled" />
+        app:labelVisibilityMode="unlabeled"
+        android:background="?attr/colorPrimary"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
