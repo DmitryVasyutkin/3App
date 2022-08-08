@@ -69,6 +69,9 @@ class FlashCallCollectionFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = recyclerItemAdapter
         }
+        binding.ibBackFlashCalls.setOnClickListener {
+            activity?.onBackPressed()
+        }
         viewModel.getWallpapers(createFullLink(AppUtils.flashCallSubsUrl))
         lifecycleScope.launch {
             viewModel.wallUiStateFlow.collect(){

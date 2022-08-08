@@ -1,3 +1,4 @@
+
 package io.mobidoo.a3app.ui.startfragment
 
 import android.content.Context
@@ -19,6 +20,8 @@ import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.initialization.InitializationStatus
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.nativead.NativeAd
 import io.mobidoo.a3app.BuildConfig
 import io.mobidoo.a3app.R
@@ -29,10 +32,7 @@ import io.mobidoo.a3app.databinding.LayoutAdCollectionsBinding
 import io.mobidoo.a3app.databinding.LayoutAdSplashBinding
 import io.mobidoo.a3app.di.Injector
 import io.mobidoo.a3app.entity.uistate.allcollectionstate.AllCollectionsUIState
-import io.mobidoo.a3app.ui.FlashCallPreviewActivity
-import io.mobidoo.a3app.ui.MainActivity
-import io.mobidoo.a3app.ui.SettingsActivity
-import io.mobidoo.a3app.ui.WallpaperActivity
+import io.mobidoo.a3app.ui.*
 import io.mobidoo.a3app.utils.AppUtils.expand
 import io.mobidoo.a3app.utils.AppUtils.getWallpaperTypeFromLink
 import io.mobidoo.a3app.viewmodels.MainActivityViewModel
@@ -40,6 +40,7 @@ import io.mobidoo.a3app.viewmodels.MainActivityViewModelFactory
 import io.mobidoo.domain.common.Constants.WALLS_HEIGHT_TO_WIDTH_DIMENSION
 import io.mobidoo.domain.entities.wallpaper.Wallpaper
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
@@ -73,6 +74,14 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
 
     private var uiUpdatesJob: Job? = null
 
+    private var mInterstitialAd: InterstitialAd? = null
+    private var interstitialLoaded = false
+    private var interIsShowing = false
+    private var selectedWallpaperItem: Wallpaper? = null
+    private var selectedFlashCallUrl: String? = null
+
+    private var fragmentWasPaused = false
+
     override fun onAttach(context: Context) {
         (activity?.application as Injector).createWallpaperSubComponent().inject(this)
         viewModel = ViewModelProvider(viewModelStore, factory)[MainActivityViewModel::class.java]
@@ -88,15 +97,22 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
         return binding.root
     }
 
+    override fun onPause() {
+        fragmentWasPaused = true
+        super.onPause()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val request = RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("34A6AF4C95E8EC517667A12EF589AB8B")).build()
-        MobileAds.setRequestConfiguration(request)
-        MobileAds.initialize(requireContext(), object: OnInitializationCompleteListener {
-            override fun onInitializationComplete(p0: InitializationStatus) {
-                loadAds()
-            }
-        })
+//        val request = RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("34A6AF4C95E8EC517667A12EF589AB8B")).build()
+//        MobileAds.setRequestConfiguration(request)
+//        MobileAds.initialize(requireContext(), object: OnInitializationCompleteListener {
+//            override fun onInitializationComplete(p0: InitializationStatus) {
+//                loadAds()
+//            }
+//        })
+        loadAds()
+//        loadInterAd()
         initializeRecyclers()
         binding.btnSeeAllLive.setOnClickListener(this)
         binding.btnSeeAllNew.setOnClickListener(this)
@@ -108,7 +124,7 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
         binding.ibSettings.setOnClickListener(this)
         adViewLayout1 = view.findViewById(R.id.ad_layout_collections1)
         adViewLayout2 = view.findViewById(R.id.ad_layout_collections2)
-        uiUpdatesJob = lifecycleScope.launchWhenResumed {
+        uiUpdatesJob = lifecycleScope.launch {
             viewModel.uiStateFlow.collect(){
                 Log.i(TAG, "uiState $it")
                 uiState = it
@@ -138,6 +154,8 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
             }
         }
     }
+
+
 
     private fun loadAds(){
         nativeAds.forEach {
@@ -203,8 +221,17 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
 
     }
     private fun handleIemClick(item: Wallpaper){
+//        selectedWallpaperItem = item
+//        if (interstitialLoaded && mInterstitialAd != null){
+//            interIsShowing = true
+//            mInterstitialAd?.show(requireActivity())
+//        }else if(interstitialLoaded && mInterstitialAd == null){
+//            startActivity(
+//                WallpaperActivity.getIntent(requireActivity(), item.url, resources.getString(R.string.common_folder), getWallpaperTypeFromLink(item.url)))
+//        }
         startActivity(
             WallpaperActivity.getIntent(requireActivity(), item.url, resources.getString(R.string.common_folder), getWallpaperTypeFromLink(item.url)))
+
     }
     private fun initializeRecyclers() {
         liveWallsAdapter = StartWallpaperCollectionsAdapter {
@@ -266,6 +293,13 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
     }
 
     private fun handleFlashCallItemClick(url: String) {
+//        selectedFlashCallUrl = url
+//        if (interstitialLoaded && mInterstitialAd != null){
+//            interIsShowing = true
+//            mInterstitialAd?.show(requireActivity())
+//        }else if(interstitialLoaded && mInterstitialAd == null){
+//            startActivity(FlashCallPreviewActivity.getIntent(requireActivity(), url, resources.getString(R.string.flash_calls)))
+//        }
         startActivity(FlashCallPreviewActivity.getIntent(requireActivity(), url, resources.getString(R.string.flash_calls)))
     }
 
@@ -273,6 +307,9 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
         super.onResume()
         nativeAds.clear()
         viewModel.getStartCollection()
+        selectedFlashCallUrl = null
+        selectedWallpaperItem = null
+
     }
 
     override fun onStop() {

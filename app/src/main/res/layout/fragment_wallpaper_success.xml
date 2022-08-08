@@ -26,16 +26,35 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"/>
 
-        <ImageButton
-            android:id="@+id/ibCloseSuccessSaving"
+        <RelativeLayout
+            android:id="@+id/rl_ib_close_wallp_fragment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:src="@drawable/ic_baseline_close_36"
-            android:background="@android:color/transparent"
-            android:foreground="?attr/selectableItemBackground"
-            android:visibility="visible"/>
+            android:layout_alignParentEnd="true">
+
+            <ImageButton
+                android:id="@+id/ibCloseSuccessSaving"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_close_36"
+                android:background="@android:color/transparent"
+                android:foreground="?attr/selectableItemBackground"
+                android:visibility="visible"
+                android:layout_centerInParent="true"/>
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/pb_close_success_wallp_fr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                app:trackThickness="5dp"
+                app:trackColor="@color/purple_200"
+                android:indeterminate="true"
+                style="@style/Widget.Material3.CircularProgressIndicator.Medium"
+                android:visibility="gone"/>
+        </RelativeLayout>
+
     </RelativeLayout>
 
 

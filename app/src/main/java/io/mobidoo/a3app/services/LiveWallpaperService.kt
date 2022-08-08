@@ -1,7 +1,6 @@
 package io.mobidoo.a3app.services
 
-import android.app.WallpaperManager
-import android.content.Intent
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.net.Uri
 import android.service.wallpaper.WallpaperService
@@ -10,9 +9,6 @@ import android.view.SurfaceHolder
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
-import io.mobidoo.a3app.utils.AppUtils
-import java.io.FileDescriptor
-import java.io.PrintWriter
 
 class LiveWallpaperService : WallpaperService() {
 
@@ -45,6 +41,7 @@ class LiveWallpaperService : WallpaperService() {
                 .setVideoScalingMode(C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING)
                 .build()
             exoPlayer.setMediaItem(MediaItem.fromUri(uri))
+            exoPlayer.volume = 0f
             exoPlayer.repeatMode = ExoPlayer.REPEAT_MODE_ALL
             exoPlayer.prepare()
 
@@ -53,6 +50,7 @@ class LiveWallpaperService : WallpaperService() {
 
         override fun onSurfaceCreated(holder: SurfaceHolder) {
             exoPlayer.setVideoSurface(holder.surface)
+            exoPlayer.volume = 0f
             exoPlayer.play()
 //            mediaPlayer?.setSurface(holder.surface)
 //            mediaPlayer?.start()
@@ -66,5 +64,7 @@ class LiveWallpaperService : WallpaperService() {
             exoPlayer.release()
 
         }
+
+
     }
 }

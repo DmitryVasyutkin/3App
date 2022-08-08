@@ -77,15 +77,16 @@
 
                     <Button
                         android:id="@+id/btnSeeAllFlash"
-                        android:backgroundTint="@color/collectionBackground"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
+                        android:backgroundTint="@color/collectionBackground"
                         android:drawableEnd="@drawable/ic_baseline_arrow_forward_24"
                         android:fontFamily="@font/ubuntu_bold"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
                         android:text="@string/see_all"
+                        android:textAllCaps="false"
                         android:textColor="@color/white"
                         android:textSize="14sp" />
 
@@ -144,14 +145,15 @@
 
                     <Button
                         android:id="@+id/btnSeeAllLive"
-                        android:backgroundTint="@color/collectionBackground"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
+                        android:backgroundTint="@color/collectionBackground"
                         android:drawableEnd="@drawable/ic_baseline_arrow_forward_24"
                         android:fontFamily="@font/ubuntu_bold"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
+                        android:textAllCaps="false"
                         android:text="@string/see_all"
                         android:textColor="@color/white"
                         android:textSize="14sp" />
@@ -224,6 +226,7 @@
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
                         android:textColor="@color/white"
+                        android:textAllCaps="false"
                         android:text="@string/see_all"
                         android:textSize="14sp" />
 
@@ -297,6 +300,7 @@
                         android:insetTop="0dp"
                         android:textColor="@color/white"
                         android:insetBottom="0dp"
+                        android:textAllCaps="false"
                         android:text="@string/see_all"
                         android:textSize="14sp" />
 
@@ -365,6 +369,7 @@
                         android:insetTop="0dp"
                         android:textColor="@color/white"
                         android:insetBottom="0dp"
+                        android:textAllCaps="false"
                         android:text="@string/see_all"
                         android:textSize="14sp" />
 
@@ -432,6 +437,7 @@
                         android:textColor="@color/white"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
+                        android:textAllCaps="false"
                         android:text="@string/see_all"
                         android:textSize="14sp" />
 
@@ -506,6 +512,7 @@
                         android:textColor="@color/white"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
+                        android:textAllCaps="false"
                         android:text="@string/see_all"
                         android:textSize="14sp" />
 

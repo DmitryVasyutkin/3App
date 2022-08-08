@@ -210,9 +210,28 @@
                 android:foreground="?attr/selectableItemBackground"/>
         </RelativeLayout>
 
+
+
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <RelativeLayout
+        android:id="@+id/rl_inter_ad_placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/collectionBackground">
 
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            app:trackThickness="5dp"
+            app:trackColor="@color/purple_200"
+            android:indeterminate="true"
+            style="@style/Widget.Material3.CircularProgressIndicator.Medium"
+            android:visibility="visible"/>
+    </RelativeLayout>
 
 <!--    <RelativeLayout-->
 <!--        android:id="@+id/rl_ad_success_saving"-->

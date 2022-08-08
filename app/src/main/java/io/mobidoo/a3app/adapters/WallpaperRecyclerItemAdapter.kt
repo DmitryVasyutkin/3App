@@ -74,6 +74,7 @@ class WallpaperRecyclerItemAdapter(private val onClick: (String) -> (Unit)) : Re
             wallAdapter.setList(item.list)
         }
     }
+
     inner class AdvertisingViewHolder(private val binding: LayoutWallCategoryAdBinding): RecyclerView.ViewHolder(binding.root){
 
         fun onBind(recyclerItem: WallpaperRecyclerItem){

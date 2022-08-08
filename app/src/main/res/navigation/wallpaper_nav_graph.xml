@@ -14,6 +14,9 @@
         <action
             android:id="@+id/action_wallpaperActionFragment_to_installWallpaperFragment"
             app:destination="@id/installWallpaperFragment" />
+        <action
+            android:id="@+id/action_wallpaperActionFragment_to_wallpaperPreviewSuccessFragment"
+            app:destination="@id/wallpaperPreviewSuccessFragment" />
     </fragment>
     <fragment
         android:id="@+id/wallpaperPreviewSuccessFragment"

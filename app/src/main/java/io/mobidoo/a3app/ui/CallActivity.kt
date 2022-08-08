@@ -10,6 +10,9 @@ import android.os.Bundle
 import android.os.PowerManager
 import android.telecom.Call
 import android.telecom.CallAudioState
+import android.telecom.TelecomManager
+import android.telephony.TelephonyManager
+import android.util.Log
 import android.view.*
 import android.widget.EditText
 import androidx.annotation.ChecksSdkIntAtLeast
@@ -25,15 +28,20 @@ import io.mobidoo.a3app.utils.*
 import io.mobidoo.a3app.utils.Constants.APP_PREFS
 import io.mobidoo.a3app.utils.Constants.SP_FLASH_CAL_URI
 import kotlinx.coroutines.*
+import java.lang.reflect.Method
 import java.util.*
 
 class CallActivity : AppCompatActivity(), View.OnClickListener {
 
     companion object {
         private const val ANIMATION_DURATION = 250L
-        fun getStartIntent(context: Context): Intent {
+        fun getStartIntent(context: Context, action: String): Intent {
             val openAppIntent = Intent(context, CallActivity::class.java)
-            openAppIntent.flags = Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT or Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+            openAppIntent.putExtra("extra_action", action)
+            openAppIntent.addFlags(
+                Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT
+                        or Intent.FLAG_ACTIVITY_NEW_TASK
+                        or Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
             return openAppIntent
         }
     }
@@ -47,30 +55,81 @@ class CallActivity : AppCompatActivity(), View.OnClickListener {
     private var proximityWakeLock: PowerManager.WakeLock? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        window?.decorView?.systemUiVisibility = (
+            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                    or View.SYSTEM_UI_FLAG_IMMERSIVE
+                    or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    or View.SYSTEM_UI_FLAG_FULLSCREEN
+        )
+        addLockScreenFlags()
         super.onCreate(savedInstanceState)
+        Log.i("CallActivity", "Oncreate call activity")
         binding = ActivityCallBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setInset(binding.root)
         val uriString = getSharedPreferences(APP_PREFS, MODE_PRIVATE).getString(SP_FLASH_CAL_URI, "")!!
         initializePlayer(uriString)
-        if (CallManager.getPhoneState() == NoCall) {
-            finish()
-            return
+        val number = intent?.getStringExtra("extra_action")
+//        if (CallManager.getPhoneState() == NoCall) {
+//            finish()
+//            return
+//        }
+        binding.tvIncomingCallIdentefier.text = ContactsHelper.getContactNameByPhoneNumber(number, this)
+//        val photoUri = ContactsHelper.getContactPhotoByPhoneNumber(number, this)
+//        if (photoUri != null && photoUri.isNotEmpty())
+//            binding.ivIncomingCallAvatar.load(CallContactAvatarHelper(this).getCallContactAvatar(photoUri))
+
+        val tm = getSystemService(TELECOM_SERVICE) as TelecomManager
+
+        CallStateManager.setListener(object : SimpleCallStateListener {
+            override fun onStateChanged(state: String) {
+                if (state == TelephonyManager.EXTRA_STATE_IDLE || state == TelephonyManager.EXTRA_STATE_OFFHOOK){
+                    try {
+                        notificationManager.cancel(CALL_NOTIFICATION_ID)
+                        finishAffinity()
+                    }catch (e: Exception){
+
+                    }
+                }
+            }
+        })
+
+        binding.ibAcceptCall.setOnClickListener{
+            tm.acceptRingingCall()
+            tm.showInCallScreen(false)
+            finishAffinity()
+
         }
-        addLockScreenFlags()
-        binding.ibAcceptCall.setOnClickListener(this)
-        binding.ibDeclineCall.setOnClickListener(this)
-        binding.ibEndCall.setOnClickListener(this)
-        binding.ibIncCallHold.setOnClickListener(this)
-        binding.ibIncCallKeypad.setOnClickListener(this)
-        binding.ibIncCallMute.setOnClickListener(this)
-        binding.ibIncCallSpeaker.setOnClickListener(this)
-        binding.dialpadClose.setOnClickListener(this)
+//        binding.ibDeclineCall.setOnClickListener(this)
+        binding.ibDeclineCall.setOnClickListener{
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                tm.endCall()
+                finishAffinity()
+            }else{
+                try {
+                    val telephonyManager = getSystemService(TELEPHONY_SERVICE)
+                    val method: Method = Class.forName(telephonyManager.javaClass.name)
+                        .getDeclaredMethod("getITelephony", *arrayOfNulls(0))
+                    method.setAccessible(true)
+                    val `object`: Any = method.invoke(telephonyManager, arrayOfNulls<Any>(0))
+                    Class.forName(`object`.javaClass.name).getDeclaredMethod("endCall", *arrayOfNulls(0))
+                        .invoke(`object`, *arrayOfNulls(0))
+                } catch (exception: Exception) {
+                    exception.printStackTrace()
+                }
+            }
+        }
 
-        setDialpadListeners()
-
-        CallManager.addListener(callCallback)
-        updateCallState(CallManager.getPrimaryCall()!!)
+//        binding.ibIncCallHold.setOnClickListener(this)
+//        binding.ibIncCallKeypad.setOnClickListener(this)
+//        binding.ibIncCallMute.setOnClickListener(this)
+//        binding.ibIncCallSpeaker.setOnClickListener(this)
+//        binding.dialpadClose.setOnClickListener(this)
+//
+//        setDialpadListeners()
+//
+     //   CallManager.addListener(callCallback)
+//        updateCallState(CallManager.getPrimaryCall()!!)
     }
 
     private fun setDialpadListeners() {

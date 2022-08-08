@@ -34,7 +34,10 @@
                 android:layout_alignParentEnd="true"
                 android:background="@android:color/transparent"
                 android:foreground="?attr/selectableItemBackground"
-                android:padding="10dp"
+                android:paddingStart="16dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="4dp"
                 android:src="@drawable/ic_arrow_forward_lined" />
 
         </RelativeLayout>

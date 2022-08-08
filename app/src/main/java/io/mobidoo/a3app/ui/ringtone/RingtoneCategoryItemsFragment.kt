@@ -15,11 +15,15 @@ import android.os.Bundle
 import android.os.Environment
 import android.provider.Contacts
 import android.provider.ContactsContract
+import android.provider.MediaStore
 import android.provider.Settings
+import android.telecom.TelecomManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -31,13 +35,22 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import coil.load
 import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.LoadAdError
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.common.reflect.Reflection.getPackageName
+import io.mobidoo.a3app.BuildConfig
 import io.mobidoo.a3app.R
+import io.mobidoo.a3app.adapters.RingtoneApp
 import io.mobidoo.a3app.adapters.RingtoneCategoryItemsAdapter
 import io.mobidoo.a3app.databinding.ExoPlaybackControlViewLayoutBinding
 import io.mobidoo.a3app.databinding.FragmentRingtoneActionsBinding
@@ -52,6 +65,7 @@ import io.mobidoo.a3app.ui.wallpaperpreview.WallpaperPreviewSuccessFragment
 import io.mobidoo.a3app.utils.AppUtils.createFullLink
 import io.mobidoo.a3app.utils.FileDownloaderListener
 import io.mobidoo.a3app.utils.MediaLoadManager
+import io.mobidoo.a3app.utils.getFileName
 import io.mobidoo.a3app.viewmodels.RingtonesViewModel
 import io.mobidoo.a3app.viewmodels.RingtonesViewModelFactory
 import io.mobidoo.domain.common.Constants
@@ -62,6 +76,7 @@ import javax.inject.Inject
 class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
 
     companion object{
+        private const val TAG = "RingtoneCategoryItemsFragment"
         const val ARG_RINGTONE = "arg_ringtone"
         private const val RC_PERMISSIONS = 1234
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.WRITE_SETTINGS, Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS)
@@ -214,6 +229,8 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
 
             binding.layoutRingtoneActionsFragment.visibility = View.VISIBLE
         }
+
+
     }
 
     override fun shouldShowRequestPermissionRationale(permission: String): Boolean {
@@ -235,59 +252,64 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
         }
     }
 
+    private suspend fun checkIfRingtoneIsDefault(ringtoneApp: RingtoneApp){
+        val dRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(requireContext(), RingtoneManager.TYPE_RINGTONE)
+        val dNotificationUri = RingtoneManager.getActualDefaultRingtoneUri(requireContext(), RingtoneManager.TYPE_NOTIFICATION)
+        val dAlarmUri = RingtoneManager.getActualDefaultRingtoneUri(requireContext(), RingtoneManager.TYPE_ALARM)
+//        Log.i(TAG, "dRingtoneUri $dRingtoneUri")
+//        Log.i(TAG, "dNotificationUri $dNotificationUri")
+//        Log.i(TAG, "dAlarmUri $dAlarmUri")
+        Log.i(TAG, "currentPlayRingt fileName ${currentPlayingRingtone?.url?.getFileName()}")
+        Log.i(TAG, "ringtoneApp fileName ${ringtoneApp.url.getFileName()}")
+
+        val dRingtoneTitle = mediaLoadManager?.getRingtoneTitle(dRingtoneUri, name)
+        Log.i(TAG, "ringtone title $dRingtoneTitle")
+        withContext(Dispatchers.Main){
+            if (dRingtoneTitle == ringtoneApp.url.getFileName()){
+                Log.i(TAG, "ringtone installed")
+                setSuccessButtonIcon(actionBinding.btnSetAsRingtone)
+            }else{
+                setDefaultButtonIcon(actionBinding.btnSetAsRingtone)
+            }
+        }
+        val dNotifTitle = mediaLoadManager?.getRingtoneTitle(dNotificationUri, name)
+        Log.i(TAG, "notif title $dNotifTitle")
+        withContext(Dispatchers.Main){
+            if (dNotifTitle == ringtoneApp.url.getFileName()){
+                Log.i(TAG, "notif installed")
+                setSuccessButtonIcon(actionBinding.btnSetAsNotificationSound)
+            }else{
+                setDefaultButtonIcon(actionBinding.btnSetAsNotificationSound)
+            }
+        }
+
+        val dAlarmTitle = mediaLoadManager?.getRingtoneTitle(dAlarmUri, name)
+        Log.i(TAG, "alarm title $dAlarmTitle")
+        withContext(Dispatchers.Main){
+            if (dAlarmTitle == ringtoneApp.url.getFileName()){
+                Log.i(TAG, "alarm installed")
+                setSuccessButtonIcon(actionBinding.btnSetAsAlarm)
+            }else{
+                setDefaultButtonIcon(actionBinding.btnSetAsAlarm)
+            }
+        }
+
+        val ringExist = mediaLoadManager?.isRingtoneExists(ringtoneApp, name)
+        Log.i(TAG, "ringt downloaded $ringExist")
+        if (ringExist != null){
+            withContext(Dispatchers.Main){
+                setSuccessButtonIcon(actionBinding.btnDownloadRingtone)
+            }
+        }else{
+            setDefaultButtonIcon(actionBinding.btnDownloadRingtone)
+        }
+    }
+
 
     private fun initializeRingtonesAdapter() {
         ringtonesAdapter = RingtoneCategoryItemsAdapter({ playRingtone, position ->
             try {
-                currentPlayingRingtone = playRingtone
-//                when(playerState){
-//                    STATE_IDLE -> {
-//                        currentPlayingPosition = position
-//                        setAudioControlTitles(playRingtone)
-//                        setActionsLayoutTitle(playRingtone)
-//                        mediaPlayer.reset()
-//                        mediaPlayer.setDataSource(
-//                            requireContext(),
-//                            Uri.parse(createFullLink(playRingtone.url))
-//                        )
-//                        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-//                        mediaPlayer.prepare()
-//                    }
-//                    STATE_PLAY -> {
-//                        if (currentPlayingPosition == position){
-//                            pauseRingtone()
-//                        }
-//                    }
-//                    STATE_PAUSE -> {
-//                        if (currentPlayingPosition == position){
-//                            resumeRingtone(currentDuration)
-//                        }else{
-//                            currentPlayingPosition = position
-//                            setAudioControlTitles(playRingtone)
-//                            setActionsLayoutTitle(playRingtone)
-//                            mediaPlayer.reset()
-//                            mediaPlayer.setDataSource(
-//                                requireContext(),
-//                                Uri.parse(createFullLink(playRingtone.url))
-//                            )
-//                            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-//                            mediaPlayer.prepare()
-//                        }
-//                    }
-//                    STATE_STOP -> {
-//                        currentPlayingPosition = position
-//                        setAudioControlTitles(playRingtone)
-//                        setActionsLayoutTitle(playRingtone)
-//                        mediaPlayer.reset()
-//                        mediaPlayer.setDataSource(
-//                            requireContext(),
-//                            Uri.parse(createFullLink(playRingtone.url))
-//                        )
-//                        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-//                        mediaPlayer.prepare()
-//                    }
-//                }
-                currentPlayingRingtone = playRingtone
+                currentPlayingRingtone = playRingtone.toRingtone()
                 if (mediaPlayer.isPlaying && currentPlayingPosition == position) {
                     pauseRingtone()
                 } else if (!mediaPlayer.isPlaying && currentPlayingPosition == position) {
@@ -302,8 +324,8 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
                 } else if (mediaPlayer.isPlaying && currentPlayingPosition != position) {
                     pauseRingtone()
                     currentPlayingPosition = position
-                    setAudioControlTitles(playRingtone)
-                    setActionsLayoutTitle(playRingtone)
+                    setAudioControlTitles(playRingtone.toRingtone())
+                    setActionsLayoutTitle(playRingtone.toRingtone())
                     mediaPlayer.reset()
                     mediaPlayer.setDataSource(
                         requireContext(),
@@ -313,8 +335,8 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
                     mediaPlayer.prepare()
                 } else {
                     currentPlayingPosition = position
-                    setAudioControlTitles(playRingtone)
-                    setActionsLayoutTitle(playRingtone)
+                    setAudioControlTitles(playRingtone.toRingtone())
+                    setActionsLayoutTitle(playRingtone.toRingtone())
                     mediaPlayer.reset()
                     mediaPlayer.setDataSource(
                         requireContext(),
@@ -335,13 +357,17 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
 
 
         }, { actionRington, position ->
-
-            currentPlayingRingtone = actionRington
+            currentPlayingRingtone = actionRington.toRingtone()
+            requireActivity().intent?.putExtra(RingtoneCategoryItemsActivity.EXTRA_RINGTONE_POS, position)
+            requireActivity().intent?.putExtra(RingtoneCategoryItemsActivity.EXTRA_RINGTONE, actionRington.toRingtone())
+            lifecycleScope.launch {
+                checkIfRingtoneIsDefault(actionRington)
+            }
             if (currentPlayingPosition != position){
                 pauseRingtone()
                 currentPlayingPosition = position
-                setAudioControlTitles(actionRington)
-                setActionsLayoutTitle(actionRington)
+                setAudioControlTitles(actionRington.toRingtone())
+                setActionsLayoutTitle(actionRington.toRingtone())
                 mediaPlayer.reset()
                 mediaPlayer.setDataSource(
                     requireContext(),
@@ -482,14 +508,51 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
             binding.ivRingtonesCategoryControl.load(createFullLink(ringtone.imageUrl))
             binding.tvRingtoneTitle1Control.text = ringtone.title
             binding.tvRingtoneTitle2Control.text = ringtone.url.split("/").last().split(".").last()
+            loadAds(uiState.ringtones.size / (Constants.AD_FREQUENCY_RINGTONES))
+            lifecycleScope.launch {
+                checkIfRingtoneIsDefault(currentPlayingRingtone?.toRingtoneApp()!!)
+            }
+
         }
 
-        ringtonesAdapter.setList(createList(uiState.ringtones))
+        ringtonesAdapter.setList(createList(uiState.ringtones).map { it.toRingtoneApp() })
     }
+
+    private fun loadAds(count: Int){
+        Log.i("Ringtones", "loadAds count $count")
+        val builder = AdLoader.Builder(requireContext(), BuildConfig.AD_MOB_KEY)
+            .forNativeAd { nativeAd ->
+
+                if(isDetached){
+                    nativeAd.destroy()
+                    return@forNativeAd
+                }
+
+                ringtonesAdapter.setNativeAd(nativeAd)
+            }
+            .withAdListener(object : AdListener(){
+                override fun onAdLoaded() {
+                    super.onAdLoaded()
+
+                    Log.i("Ringtones", "onAdLoaded")
+                }
+
+                override fun onAdFailedToLoad(p0: LoadAdError) {
+
+                    Log.i("Ringtones", "nativeAd failed ${p0.message}")
+                }
+            })
+            .build()
+        val request = AdRequest.Builder()
+            .build()
+        builder.loadAds(request, count)
+    }
+
 
     override fun onClick(view: View?) {
         when(view?.id){
             binding.ibPlayRingtoneControls.id -> {
+                Log.i("RingtoneFragment", "currentPlayingRingtone $currentPlayingRingtone")
                 if (currentPlayingRingtone !=null){
                     if (mediaPlayer.isPlaying) {
                         pauseRingtone()
@@ -511,7 +574,7 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
                 activity?.onBackPressed()
             }
             actionBinding.ibRingtonePlayActions.id -> {
-
+                Log.i("RingtoneFragment", "currentPlayingRingtone $currentPlayingRingtone")
                 if (mediaPlayer.isPlaying) {
                     pauseRingtone()
                 }else {
@@ -560,7 +623,30 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
                 }
             }
             actionBinding.btnDownloadRingtone.id -> {
-                downloadRingtone()
+                lifecycleScope.launch {
+                    val ringExist = currentPlayingRingtone?.toRingtoneApp()
+                        ?.let { mediaLoadManager?.isRingtoneExists(it, name) }
+                    Log.i(TAG, "ringt downloaded2 $ringExist")
+                    if (ringExist != null){
+                        withContext(Dispatchers.Main){
+                            val downloadedPath = "${Environment.DIRECTORY_RINGTONES}/${resources.getString(R.string.app_name)}/$name"
+                            dialogLoadedFragment = RingtoneDownloadedDialog({
+                                val intent = Intent().apply {
+                                    setAction(android.content.Intent.ACTION_VIEW)
+                                    setDataAndType(Uri.parse(ringExist), "audio/*")
+                                }
+                                startActivity(intent)
+                            }, currentPlayingRingtone!!, downloadedPath)
+
+                            dialogLoadedFragment?.show(activity?.supportFragmentManager?.beginTransaction()!!, "downloaded_dialog")
+                        }
+                    }else{
+                        withContext(Dispatchers.Main){
+                            downloadRingtone()
+                        }
+                    }
+                }
+
             }
         }
     }
@@ -581,7 +667,7 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
     }
 
     private fun setAsSystemRingtone() {
-
+            actionLoadingRingtone(actionBinding.ivSetRingtone, actionBinding.pbLoadingSetRingtone, true)
             lifecycleScope.launch {
                 mediaLoadManager?.downloadRingtone(
                     currentPlayingRingtone!!,
@@ -590,10 +676,14 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
                         override suspend fun success(path: String) {
                             withContext(Dispatchers.Main) {
                                 setDownloadedRingtoneAsDefault(path)
+                                actionLoadingRingtone(actionBinding.ivSetRingtone, actionBinding.pbLoadingSetRingtone, false)
                             }
                         }
 
-                        override fun error(message: String) {
+                        override suspend fun error(message: String) {
+                            withContext(Dispatchers.Main){
+                                actionLoadingRingtone(actionBinding.ivSetRingtone, actionBinding.pbLoadingSetRingtone, false)
+                            }
 
                         }
                     })
@@ -602,8 +692,23 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
 
     }
 
-    private fun setAsSystemNotification() {
+    private fun actionLoadingRingtone(
+        imageView: ImageView,
+        progressBar: CircularProgressIndicator,
+        showLoading: Boolean
+    ) {
+        if(showLoading){
+            imageView.visibility = View.GONE
+            progressBar.visibility = View.VISIBLE
+        }else{
+            progressBar.visibility = View.GONE
+            imageView.visibility =View.VISIBLE
+        }
+    }
 
+
+    private fun setAsSystemNotification() {
+        actionLoadingRingtone(actionBinding.ivSetNotification, actionBinding.pbLoadingSetNotification, true)
             lifecycleScope.launch {
                 mediaLoadManager?.downloadRingtone(
                     currentPlayingRingtone!!,
@@ -612,17 +717,21 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
                         override suspend fun success(path: String) {
                             withContext(Dispatchers.Main) {
                                 setDownloadedRingtoneAsNotification(path)
+                                actionLoadingRingtone(actionBinding.ivSetNotification, actionBinding.pbLoadingSetNotification, false)
                             }
                         }
 
-                        override fun error(message: String) {
+                        override suspend fun error(message: String) {
+                            withContext(Dispatchers.Main){
+                                actionLoadingRingtone(actionBinding.ivSetNotification, actionBinding.pbLoadingSetNotification, false)
+                            }
 
                         }
                     })
             }
     }
     private fun setAsSystemAlarm() {
-
+        actionLoadingRingtone(actionBinding.ivSetAlarm, actionBinding.pbLoadingSetAlarm, true)
             lifecycleScope.launch {
                 mediaLoadManager?.downloadRingtone(
                     currentPlayingRingtone!!,
@@ -631,10 +740,14 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
                         override suspend fun success(path: String) {
                             withContext(Dispatchers.Main) {
                                 setDownloadedRingtoneAsAlarm(path)
+                                actionLoadingRingtone(actionBinding.ivSetAlarm, actionBinding.pbLoadingSetAlarm, false)
                             }
                         }
 
-                        override fun error(message: String) {
+                        override suspend fun error(message: String) {
+                            withContext(Dispatchers.Main){
+                                actionLoadingRingtone(actionBinding.ivSetAlarm, actionBinding.pbLoadingSetAlarm, false)
+                            }
 
                         }
                     })
@@ -642,7 +755,7 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
 
     }
     private fun setAsContactRingtone(contUri: String) {
-
+        actionLoadingRingtone(actionBinding.ivSetContactRingtone, actionBinding.pbLoadingSetContactRingtone, true)
         lifecycleScope.launch {
             mediaLoadManager?.downloadRingtone(
                 currentPlayingRingtone!!,
@@ -652,10 +765,14 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
                         withContext(Dispatchers.Main) {
                             downloadedRingtoneUri = path
                             setDownloadedRingtoneAsContactRing(contUri)
+                            actionLoadingRingtone(actionBinding.ivSetContactRingtone, actionBinding.pbLoadingSetContactRingtone, false)
                         }
                     }
 
-                    override fun error(message: String) {
+                    override suspend fun error(message: String) {
+                        withContext(Dispatchers.Main){
+                            actionLoadingRingtone(actionBinding.ivSetContactRingtone, actionBinding.pbLoadingSetContactRingtone, false)
+                        }
 
                     }
                 })
@@ -664,84 +781,126 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
     }
 
     private fun setDownloadedRingtoneAsDefault(uri: String){
-        RingtoneManager.setActualDefaultRingtoneUri(requireContext(), RingtoneManager.TYPE_RINGTONE, Uri.parse(uri))
-        setSuccessButtonIcon(actionBinding.btnSetAsRingtone)
-        handleSuccessSaving()
+        try {
+            RingtoneManager.setActualDefaultRingtoneUri(requireContext(), RingtoneManager.TYPE_RINGTONE, Uri.parse(uri))
+        }catch (e: Exception){
+            Log.e(TAG, "setAsRingtone exc $e")
+        }finally {
+            setSuccessButtonIcon(actionBinding.btnSetAsRingtone)
+            handleSuccessSaving()
+        }
+
+
     }
     private fun setDownloadedRingtoneAsNotification(uri: String){
-        RingtoneManager.setActualDefaultRingtoneUri(requireContext(), RingtoneManager.TYPE_NOTIFICATION, Uri.parse(uri))
-        setSuccessButtonIcon(actionBinding.btnSetAsNotificationSound)
-        handleSuccessSaving()
+        try{
+            RingtoneManager.setActualDefaultRingtoneUri(requireContext(), RingtoneManager.TYPE_NOTIFICATION, Uri.parse(uri))
+        }catch (e: Exception){
+            Log.e(TAG, "setAsNotif exc $e")
+        }finally {
+            setSuccessButtonIcon(actionBinding.btnSetAsNotificationSound)
+            handleSuccessSaving()
+        }
+
+
     }
     private fun setDownloadedRingtoneAsAlarm(uri: String){
-        RingtoneManager.setActualDefaultRingtoneUri(requireContext(), RingtoneManager.TYPE_ALARM, Uri.parse(uri))
-        setSuccessButtonIcon(actionBinding.btnSetAsAlarm)
-        handleSuccessSaving()
+        try {
+            RingtoneManager.setActualDefaultRingtoneUri(requireContext(), RingtoneManager.TYPE_ALARM, Uri.parse(uri))
+        }catch (e: Exception){
+            Log.e(TAG, "setAsAlarm exc $e")
+        }finally {
+            setSuccessButtonIcon(actionBinding.btnSetAsAlarm)
+            handleSuccessSaving()
+        }
     }
     private fun setDownloadedRingtoneAsContactRing(uri: String){
         val PROJECTION: Array<out String> = arrayOf(
             ContactsContract.Contacts._ID,
             ContactsContract.Contacts.LOOKUP_KEY
         )
-        val cursor = activity?.contentResolver?.query(Uri.parse(uri), PROJECTION, null, null, null)
-        cursor.use { cursor ->
-            cursor.use {
-                it?.moveToFirst()
-                val id = it?.getLong(0)!!
-                val lookupKey = it?.getString(1)
-                val contactUri = ContactsContract.Contacts.getLookupUri(id, lookupKey)
-                Log.i("RingtonePermission", "contactUri $contactUri")
-                if (contactUri != null){
-                    val cv = ContentValues().apply {
-                        put(ContactsContract.Contacts.CUSTOM_RINGTONE, downloadedRingtoneUri)
+        try {
+            val cursor = activity?.contentResolver?.query(Uri.parse(uri), PROJECTION, null, null, null)
+            cursor.use { cursor ->
+                cursor.use {
+                    it?.moveToFirst()
+                    val id = it?.getLong(0)!!
+                    val lookupKey = it?.getString(1)
+                    val contactUri = ContactsContract.Contacts.getLookupUri(id, lookupKey)
+                    Log.i("RingtonePermission", "contactUri $contactUri")
+                    if (contactUri != null){
+                        val cv = ContentValues().apply {
+                            put(ContactsContract.Contacts.CUSTOM_RINGTONE, downloadedRingtoneUri)
+                        }
+                        activity?.contentResolver?.update(contactUri, cv, null, null)
                     }
-                    activity?.contentResolver?.update(contactUri, cv, null, null)
                 }
             }
+        }catch(e: Exception){
+            Log.e(TAG, "setContactRin exc $e")
+        }finally {
+            setSuccessButtonIcon(actionBinding.btnSetContactRingtone)
+            handleSuccessSaving()
         }
-        setSuccessButtonIcon(actionBinding.btnSetContactRingtone)
     }
 
     private fun downloadRingtone(){
+        actionLoadingRingtone(actionBinding.ivDownloadRingtone, actionBinding.pbLoadingRingtone, true)
         lifecycleScope.launch {
-            mediaLoadManager?.downloadRingtone(
-                currentPlayingRingtone!!,
-                name,
-                object : FileDownloaderListener {
-                    override suspend fun success(path: String) {
-                        val downloadedPath = "${Environment.DIRECTORY_RINGTONES}/${resources.getString(R.string.app_name)}/$name"
-                        withContext(Dispatchers.Main) {
-                            dialogLoadedFragment = RingtoneDownloadedDialog({
-                                val intent = Intent().apply {
-                                    setAction(android.content.Intent.ACTION_VIEW)
-                                    setDataAndType(Uri.parse(path), "audio/*")
-                                }
-                                startActivity(intent)
-                            }, currentPlayingRingtone!!, downloadedPath)
+            try {
+                mediaLoadManager?.downloadRingtone(
+                    currentPlayingRingtone!!,
+                    name,
+                    object : FileDownloaderListener {
+                        override suspend fun success(path: String) {
 
-                            dialogLoadedFragment?.show(activity?.supportFragmentManager?.beginTransaction()!!, "downloaded_dialog")
+
+                            withContext(Dispatchers.Main) {
+                                val downloadedPath = "${Environment.DIRECTORY_RINGTONES}/${resources.getString(R.string.app_name)}/$name"
+                                actionLoadingRingtone(actionBinding.ivDownloadRingtone, actionBinding.pbLoadingRingtone, false)
+                                dialogLoadedFragment = RingtoneDownloadedDialog({
+                                    val intent = Intent().apply {
+                                        setAction(android.content.Intent.ACTION_VIEW)
+                                        setDataAndType(Uri.parse(path), "audio/*")
+                                    }
+                                    startActivity(intent)
+                                }, currentPlayingRingtone!!, downloadedPath)
+
+                                dialogLoadedFragment?.show(activity?.supportFragmentManager?.beginTransaction()!!, "downloaded_dialog")
+                            }
                         }
-                    }
 
-                    override fun error(message: String) {
+                        override suspend fun error(message: String) {
+                            Log.e(TAG, "downl exc $message")
+                            withContext(Dispatchers.Main){
+                                actionLoadingRingtone(actionBinding.ivDownloadRingtone, actionBinding.pbLoadingRingtone, false)
+                            }
 
-                    }
-                })
+                        }
+                    })
+            }catch (e: Exception){
+                Log.e(TAG, "downl exc $e")
+            }
         }
     }
 
     private fun setSuccessButtonIcon(button: MaterialButton){
         button.setIcon(ResourcesCompat.getDrawable(resources, R.drawable.ic_success_ringtone, null))
     }
+    private fun setDefaultButtonIcon(button: MaterialButton){
+        button.setIcon(ResourcesCompat.getDrawable(resources, R.drawable.ic_baseline_arrow_forward_24, null))
+    }
 
     private fun handleSuccessSaving() {
      //   findNavController().popBackStack()
         try {
-            findNavController().navigate(R.id.action_ringtoneCategoryItemsFragment_to_ringtoneSuccessFragment, Bundle().apply {
+            val destination = Navigation.findNavController(requireView()).currentDestination
+            val action = destination?.getAction(R.id.action_ringtoneCategoryItemsFragment_to_ringtoneSuccessFragment)
+            Navigation.findNavController(requireView()).navigate(R.id.action_ringtoneCategoryItemsFragment_to_ringtoneSuccessFragment, Bundle().apply {
                 putString(WallpaperPreviewSuccessFragment.ARG_SAVED_VALUE, resources.getString(R.string.ringtone))
             })
         }catch (e: Exception){
-
+            Log.e(TAG, "navigate to success exc $e")
         }
 
     }
@@ -750,7 +909,7 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
         result.addAll(list)
         var adCount = 0
         for (i in 1..list.lastIndex){
-            if(i%(Constants.AD_FREQUENCY_CATEGORIES) == 0){
+            if(i%(Constants.AD_FREQUENCY_RINGTONES) == 0){
                 result.add(index = i+adCount, Ringtone(isAdvertising = true))
                 adCount++
             }
@@ -786,6 +945,17 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
         mediaPlayer.release()
         super.onDetach()
     }
+}
+
+fun Ringtone.toRingtoneApp(): RingtoneApp{
+    return RingtoneApp(
+        url, imageUrl, title, nameCategory, linkToFullCategory, isAdvertising, isPlayedNow
+    )
+}
+fun RingtoneApp.toRingtone(): Ringtone{
+    return Ringtone(
+        url, imageUrl, title, nameCategory, linkToFullCategory, isAdvertising
+    )
 }
 
 fun Int.toTimeFormatZeros(): String{

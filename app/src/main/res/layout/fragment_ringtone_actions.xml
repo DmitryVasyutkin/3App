@@ -50,17 +50,30 @@
                 android:layout_marginTop="10dp">
 
                 <ImageView
+                    android:id="@+id/iv_set_ringtone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_set_as_ringtone"
                     android:layout_gravity="center_vertical"/>
 
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    style="@style/Widget.Material3.CircularProgressIndicator.Medium"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_centerInParent="true"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:trackColor="@color/purple_200"
+                    app:trackThickness="5dp"
+                    android:id="@+id/pb_loading_set_ringtone" />
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_set_as_ringtone"
-                    style="@style/Widget.Material3.Button.TextButton"
+                    android:textAllCaps="false"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/setAsRingtone"
+                    android:backgroundTint="@color/collectionBackground"
                     android:textSize="16sp"
                     android:textAlignment="viewStart"
                     app:cornerRadius="0dp"
@@ -69,6 +82,7 @@
                     android:textColor="@color/white"
                     app:iconGravity="end"/>
             </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -76,14 +90,27 @@
                 android:layout_marginTop="10dp">
 
                 <ImageView
+                    android:id="@+id/iv_set_contact_ringtone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_set_contact_ringtone"
                     android:layout_gravity="center_vertical"/>
 
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    style="@style/Widget.Material3.CircularProgressIndicator.Medium"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_centerInParent="true"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:trackColor="@color/purple_200"
+                    app:trackThickness="5dp"
+                    android:id="@+id/pb_loading_set_contact_ringtone"/>
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_set_contact_ringtone"
-                    style="@style/Widget.Material3.Button.TextButton"
+                    android:backgroundTint="@color/collectionBackground"
+                    android:textAllCaps="false"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/setContactRingtone"
@@ -102,19 +129,32 @@
                 android:layout_marginTop="10dp">
 
                 <ImageView
+                    android:id="@+id/iv_set_notification"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_set_as_notification_sound"
                     android:layout_gravity="center_vertical"/>
 
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    style="@style/Widget.Material3.CircularProgressIndicator.Medium"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_centerInParent="true"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:trackColor="@color/purple_200"
+                    app:trackThickness="5dp"
+                    android:id="@+id/pb_loading_set_notification"/>
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_set_as_notification_sound"
-                    style="@style/Widget.Material3.Button.TextButton"
+                    android:backgroundTint="@color/collectionBackground"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/setAsNotification"
                     android:textSize="16sp"
                     android:textAlignment="viewStart"
+                    android:textAllCaps="false"
                     app:iconTint="@color/white"
                     android:textColor="@color/white"
                     app:cornerRadius="0dp"
@@ -129,14 +169,27 @@
                 android:layout_marginTop="10dp">
 
                 <ImageView
+                    android:id="@+id/iv_set_alarm"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_set_as_alarm_ringtone"
                     android:layout_gravity="center_vertical"/>
 
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    style="@style/Widget.Material3.CircularProgressIndicator.Medium"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_centerInParent="true"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:trackColor="@color/purple_200"
+                    app:trackThickness="5dp"
+                    android:id="@+id/pb_loading_set_alarm"/>
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_set_as_alarm"
-                    style="@style/Widget.Material3.Button.TextButton"
+                    android:backgroundTint="@color/collectionBackground"
+                    android:textAllCaps="false"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/setAsAlarm"
@@ -156,14 +209,27 @@
                 android:layout_marginTop="10dp">
 
                 <ImageView
+                    android:id="@+id/iv_download_ringtone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_download_ringtone"
                     android:layout_gravity="center_vertical"/>
 
+                <com.google.android.material.progressindicator.CircularProgressIndicator
+                    style="@style/Widget.Material3.CircularProgressIndicator.Medium"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_centerInParent="true"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    app:trackColor="@color/purple_200"
+                    app:trackThickness="5dp"
+                    android:id="@+id/pb_loading_ringtone"/>
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_download_ringtone"
-                    style="@style/Widget.Material3.Button.TextButton"
+                    android:backgroundTint="@color/collectionBackground"
+                    android:textAllCaps="false"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/download_ringtone"
@@ -174,6 +240,8 @@
                     app:cornerRadius="0dp"
                     app:icon="@drawable/ic_baseline_arrow_forward_24"
                     app:iconGravity="end"/>
+
+
             </LinearLayout>
 
         </LinearLayout>

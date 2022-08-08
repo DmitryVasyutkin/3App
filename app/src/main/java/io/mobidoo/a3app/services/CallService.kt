@@ -43,11 +43,11 @@ class CallService : InCallService() {
         if (!powerManager.isInteractive || call.isOutgoing() || isScreenLocked) {
             try {
                 Log.i("CallService", "call state ${call.getStateCompat()}")
-                startActivity(CallActivity.getStartIntent(this))
+                startActivity(CallActivity.getStartIntent(this, ""))
                 if (call.getStateCompat() != Call.STATE_RINGING) {
 
                   //  callNotificationManager.setupNotification()
-                    startActivity(CallActivity.getStartIntent(this))
+                    startActivity(CallActivity.getStartIntent(this, ""))
                 }
             } catch (e: ActivityNotFoundException) {
                 Log.i("CallService", "error $e")
@@ -57,7 +57,7 @@ class CallService : InCallService() {
             }
         } else {
            // callNotificationManager.setupNotification()
-            startActivity(CallActivity.getStartIntent(this))
+            startActivity(CallActivity.getStartIntent(this, ""))
         }
     }
 
@@ -72,7 +72,7 @@ class CallService : InCallService() {
         } else {
             callNotificationManager.setupNotification()
             if (wasPrimaryCall) {
-                startActivity(CallActivity.getStartIntent(this))
+                startActivity(CallActivity.getStartIntent(this, ""))
             }
         }
     }

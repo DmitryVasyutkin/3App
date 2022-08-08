@@ -1,6 +1,7 @@
 package io.mobidoo.a3app.utils
 
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.WallpaperManager
 import android.content.ComponentName
 import android.content.Context
@@ -14,13 +15,14 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.RelativeLayout
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.mobidoo.a3app.BuildConfig
 import io.mobidoo.a3app.R
-import io.mobidoo.a3app.entity.startcollectionitem.SelectedCategoryWallpapersFragment
 import io.mobidoo.a3app.services.LiveWallpaperService
 import io.mobidoo.a3app.ui.wallpaperpreview.WallpaperPreviewFragment
+
 
 object AppUtils {
     val flashCallSubsUrl = "/api/r3/wallpapers/live/6"
@@ -127,5 +129,15 @@ object AppUtils {
         } catch (e: Exception) {
             Log.i("InstallWallpaper", "inst exc $e")
         }
+    }
+
+    fun isServiceRunning(am: ActivityManager, serviceClass: Class<*>): Boolean {
+
+        for (service in am.getRunningServices(Int.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+        return false
     }
 }

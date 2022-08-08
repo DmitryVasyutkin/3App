@@ -9,6 +9,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Context.ROLE_SERVICE
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.media.AudioAttributes
 import android.media.RingtoneManager
@@ -25,6 +26,7 @@ import android.view.ViewGroup
 import android.view.WindowInsets
 import android.widget.RemoteViews
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -32,6 +34,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -39,20 +42,31 @@ import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import io.mobidoo.a3app.R
 import io.mobidoo.a3app.databinding.FragmentFlashCallPreviewBinding
+import io.mobidoo.a3app.di.Injector
 import io.mobidoo.a3app.ui.FlashCallPreviewActivity
+import io.mobidoo.a3app.ui.MainActivity
 import io.mobidoo.a3app.ui.bottomsheet.AllowChangeSettingsPermissions
 import io.mobidoo.a3app.ui.ringtone.RingtoneCategoryItemsFragment
+import io.mobidoo.a3app.ui.testInterAd
 import io.mobidoo.a3app.ui.wallpaperpreview.WallpaperPreviewSuccessFragment
 import io.mobidoo.a3app.utils.*
 import io.mobidoo.a3app.utils.AppUtils.createFullLink
 import io.mobidoo.a3app.utils.Constants.APP_PREFS
 import io.mobidoo.a3app.utils.Constants.SP_FLASH_CAL_URI
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import javax.inject.Inject
 
 
 class FlashCallPreviewFragment : Fragment() {
@@ -65,7 +79,12 @@ class FlashCallPreviewFragment : Fragment() {
         const val TYPE_STATIC = 0
         const val TYPE_LIVE = 1
         private val PERMISSION_SYSTEM_SETTINGS = Manifest.permission.WRITE_SETTINGS
-        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.ANSWER_PHONE_CALLS, Manifest.permission.READ_CALL_LOG, Manifest.permission.READ_PHONE_STATE)
+        private val PERMISSION_APPEAR_ON_TOP_SETTINGS = Manifest.permission.SYSTEM_ALERT_WINDOW
+        private val REQUIRED_PERMISSIONS = arrayOf(
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.ANSWER_PHONE_CALLS,
+            Manifest.permission.READ_CALL_LOG,
+            Manifest.permission.READ_PHONE_STATE)
     }
 
     private val REQUEST_CODE_SET_DEFAULT_DIALER: Int = 3335
@@ -80,10 +99,23 @@ class FlashCallPreviewFragment : Fragment() {
     private var flashCallLoaded = false
     private var systemSettingsOpened = false
 
+    private var downloadJob: Job? = null
     private lateinit var downloadManager: MediaLoadManager
     private lateinit var exoPlayer: ExoPlayer
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<Array<String>>
     private lateinit var requestPermissionLauncher2: ActivityResultLauncher<String>
+    private lateinit var requestPermissionLauncher3: ActivityResultLauncher<String>
+    private var mInterstitialAd: InterstitialAd? = null
+    private var interstitialLoaded = false
+    private var onBackPressed = false
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
+
+    override fun onAttach(context: Context) {
+        (activity?.application as Injector).createWallpaperSubComponent().inject(this)
+        super.onAttach(context)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -97,8 +129,9 @@ class FlashCallPreviewFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         link = requireActivity().intent?.extras?.getString(FlashCallPreviewActivity.EXTRA_WALLPAPER_LINK).toString()
         categoryName = requireActivity().intent?.extras?.getString(FlashCallPreviewActivity.EXTRA_CATEGORY_NAME).toString()
-        initializePlayer()
 
+
+        loadInterAd()
         downloadManager = MediaLoadManager(requireContext().contentResolver, resources,
             object : FileDownloaderListener {
                 override suspend fun success(path: String) {
@@ -109,19 +142,23 @@ class FlashCallPreviewFragment : Fragment() {
                     }
                 }
 
-                override fun error(message: String) {
+                override suspend fun error(message: String) {
                     Log.i(TAG, "file not loaded with: $message")
                 }
             })
         setTopInset(view)
         binding.ibBackFlashCallPreview.setOnClickListener {
-            activity?.finish()
+            activity?.onBackPressed()
+//            binding.rlInterAdPlaceholderFlashCall.visibility = View.VISIBLE
+//            loadInterAd()
+//            onBackPressed = true
         }
         binding.ibDownloadFlashPreview.setOnClickListener {
             if (permissionAllowed(REQUIRED_PERMISSIONS[0])
                 && permissionAllowed(REQUIRED_PERMISSIONS[1])
                 && permissionAllowed(REQUIRED_PERMISSIONS[2])
-                && permissionAllowed(REQUIRED_PERMISSIONS[3])){
+                && permissionAllowed(REQUIRED_PERMISSIONS[3])
+            ){
                 Log.i(TAG, "button downloadWallpaper")
                 downloadWallpaper(createFullLink(link), categoryName)
             }else{
@@ -172,6 +209,38 @@ class FlashCallPreviewFragment : Fragment() {
                 }
             }
         }
+//        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,object : OnBackPressedCallback(true) {
+//            override fun handleOnBackPressed() {
+////                binding.rlInterAdPlaceholderFlashCall.visibility = View.VISIBLE
+////                loadInterAd()
+////                onBackPressed = true
+//            }
+//        }
+//        )
+        requestPermissionLauncher3 = registerForActivityResult(ActivityResultContracts.RequestPermission()){isGranted ->
+            if(isGranted){
+                Log.i("FlashCallPreview", "isGranted $isGranted")
+                setDefualtRingtoneAndShowAd()
+            }else{
+                if(shouldShowRequestPermissionRationale(PERMISSION_APPEAR_ON_TOP_SETTINGS)){
+                    startActivityForResult(
+                        Intent(
+                            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                            Uri.parse("package:" + requireContext().packageName)
+                        ), 4556
+                    )
+//                    val fr = AllowChangeSettingsPermissions(){
+//                        startActivityForResult(
+//                            Intent(
+//                                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+//                                Uri.parse("package:" + requireContext().packageName)
+//                            ), 4556
+//                        )
+//                    }
+//                    fr.show(activity?.supportFragmentManager?.beginTransaction()!!, "allow_permissions")
+                }
+            }
+        }
     }
 
     private fun setDefualtRingtoneAndShowAd() {
@@ -185,20 +254,33 @@ class FlashCallPreviewFragment : Fragment() {
     }
 
     override fun shouldShowRequestPermissionRationale(permission: String): Boolean {
-        return !Settings.System.canWrite(requireContext())
+        return if(permission == PERMISSION_SYSTEM_SETTINGS) !Settings.System.canWrite(requireContext())
+        else !Settings.canDrawOverlays(requireContext())
     }
     private fun systemPermissionsGranted() = Settings.System.canWrite(requireContext())
 
     private fun setAsDefaultCaller(){
-        val sharedPreferences = activity?.getSharedPreferences(APP_PREFS, Activity.MODE_PRIVATE)!!
+//        val sharedPreferences = activity?.getSharedPreferences(APP_PREFS, Activity.MODE_PRIVATE)!!
         with(sharedPreferences.edit()){
             putString(SP_FLASH_CAL_URI, flashCallUri)
             commit()
         }
+
+        if (Settings.canDrawOverlays(requireContext())){
+            if (systemPermissionsGranted()){
+                setDefualtRingtoneAndShowAd()
+            }else{
+                requestPermissionLauncher2.launch(PERMISSION_SYSTEM_SETTINGS)
+            }
+            return
+        }else{
+            requestPermissionLauncher3.launch(PERMISSION_APPEAR_ON_TOP_SETTINGS)
+        }
+
         if (isQPlus()) {
             val roleManager = activity?.getSystemService(RoleManager::class.java)
-            if (roleManager!!.isRoleAvailable(RoleManager.ROLE_DIALER) && !roleManager.isRoleHeld(RoleManager.ROLE_DIALER)) {
-                val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_DIALER)
+            if (roleManager!!.isRoleAvailable(RoleManager.ROLE_CALL_SCREENING) && !roleManager.isRoleHeld(RoleManager.ROLE_CALL_SCREENING)) {
+                val intent = roleManager.createRequestRoleIntent(RoleManager.ROLE_CALL_SCREENING)
                 Log.i(TAG, "role intent $intent")
                 startActivityForResult(intent, REQUEST_CODE_SET_DEFAULT_DIALER)
             }else{
@@ -208,7 +290,8 @@ class FlashCallPreviewFragment : Fragment() {
                     requestPermissionLauncher2.launch(PERMISSION_SYSTEM_SETTINGS)
                 }
             }
-        } else {
+        }
+        else {
             Intent(TelecomManager.ACTION_CHANGE_DEFAULT_DIALER).putExtra(TelecomManager.EXTRA_CHANGE_DEFAULT_DIALER_PACKAGE_NAME, activity?.packageName).apply {
                 try {
                     startActivityForResult(this, REQUEST_CODE_SET_DEFAULT_DIALER)
@@ -219,9 +302,6 @@ class FlashCallPreviewFragment : Fragment() {
                 }
             }
         }
-
-
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -239,8 +319,75 @@ class FlashCallPreviewFragment : Fragment() {
         if (requestCode == REQUEST_CODE_WRITE_SETTINGS){
             setDefualtRingtoneAndShowAd()
         }
-    }
+        if(requestCode == 4556){
+            if (systemPermissionsGranted()){
+                setDefualtRingtoneAndShowAd()
+            }else{
+                requestPermissionLauncher2.launch(PERMISSION_SYSTEM_SETTINGS)
+            }
+        }
 
+    }
+    private fun loadInterAd(){
+        val adRequest = AdRequest.Builder().build()
+        InterstitialAd.load(requireContext(), testInterAd, adRequest, object : InterstitialAdLoadCallback() {
+            override fun onAdFailedToLoad(p0: LoadAdError) {
+                super.onAdFailedToLoad(p0)
+                Log.i("SplashScreen", "filed to load interstitial")
+                mInterstitialAd = null
+                interstitialLoaded = true
+                if(onBackPressed){
+                    activity?.finish()
+                }else{
+                    binding.rlInterAdPlaceholderFlashCall.visibility = View.GONE
+                    initializePlayer()
+                }
+
+            }
+
+            override fun onAdLoaded(p0: InterstitialAd) {
+                Log.i("SplashScreen", "interstitial loaded $p0")
+                super.onAdLoaded(p0)
+                mInterstitialAd = p0
+                mInterstitialAd?.fullScreenContentCallback = object: FullScreenContentCallback() {
+                    override fun onAdClicked() {
+                        // Called when a click is recorded for an ad.
+                        Log.d("SplashScreen", "Ad was clicked.")
+                    }
+
+                    override fun onAdDismissedFullScreenContent() {
+                        // Called when ad is dismissed.
+                        Log.d("SplashScreen", "Ad dismissed fullscreen content.")
+                        mInterstitialAd = null
+                        if(onBackPressed){
+                            activity?.finish()
+                        }else{
+                            binding.rlInterAdPlaceholderFlashCall.visibility = View.GONE
+                            initializePlayer()
+                        }
+                    }
+
+                    override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                        super.onAdFailedToShowFullScreenContent(p0)
+                        Log.d("SplashScreen", "Ad failed to show fullscreen content.")
+                        mInterstitialAd = null
+                    }
+
+                    override fun onAdImpression() {
+                        // Called when an impression is recorded for an ad.
+                        Log.d("SplashScreen", "Ad recorded an impression.")
+                    }
+
+                    override fun onAdShowedFullScreenContent() {
+                        // Called when ad is shown.
+                        Log.d("SplashScreen", "Ad showed fullscreen content.")
+                    }
+                }
+                interstitialLoaded = true
+                mInterstitialAd?.show(requireActivity())
+            }
+        })
+    }
     private fun setTopInset(view: View) {
         view.setOnApplyWindowInsetsListener { view, windowInsets ->
             val topInset = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -302,7 +449,7 @@ class FlashCallPreviewFragment : Fragment() {
     private fun downloadWallpaper(link: String, subFolder: String){
       //  showDownloadNotification()
         binding.rlLoadingFlashcall.visibility = View.VISIBLE
-        lifecycleScope.launch {
+        downloadJob = lifecycleScope.launch {
             downloadManager.downloadLiveWallpaper(link, subFolder, true)
         }
     }
@@ -362,6 +509,7 @@ class FlashCallPreviewFragment : Fragment() {
     override fun onDestroyView() {
         exoPlayer.stop()
         exoPlayer.release()
+        downloadJob?.cancel()
         super.onDestroyView()
     }
 }

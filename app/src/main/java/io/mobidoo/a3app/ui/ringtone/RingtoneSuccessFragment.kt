@@ -11,11 +11,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation
 import coil.load
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdLoader
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.*
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 import io.mobidoo.a3app.BuildConfig
@@ -23,6 +23,7 @@ import io.mobidoo.a3app.R
 import io.mobidoo.a3app.databinding.FragmentWallpaperSuccessBinding
 import io.mobidoo.a3app.databinding.LayoutAdSuccessSavingBinding
 import io.mobidoo.a3app.databinding.LayoutWallpaperSavedBinding
+import io.mobidoo.a3app.ui.testInterAd
 
 class RingtoneSuccessFragment : Fragment() {
     companion object{
@@ -33,8 +34,14 @@ class RingtoneSuccessFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var layoutBinding: LayoutWallpaperSavedBinding? = null
-
+    private var mNativeAd: NativeAd? = null
+    private var nativeAdLoaded = false
+    private var mInterstitialAd: InterstitialAd? = null
+    private var interstitialLoaded = false
+    private var onBackPressed = false
+    private var closeButtonPressed = false
     private var thanksPressed = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -48,23 +55,43 @@ class RingtoneSuccessFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setInsets(view)
+        loadInterAd()
         loadAd()
         val value = arguments?.getString(ARG_SAVED_VALUE)
         val tvSavedValue = view.findViewById<TextView>(R.id.greeting_layoutHeader1)
         tvSavedValue.text = String.format(resources.getString(R.string.successfullySavedWallpaper), value)
         layoutBinding?.btnThanksSuccessSaving?.setOnClickListener {
             thanksPressed = true
-            showAdvertising()
+            if (nativeAdLoaded && mNativeAd != null){
+                showAdvertising()
+            }else if(nativeAdLoaded && mNativeAd == null){
+                binding.rlWallpaperSavedAdvertisiing.visibility = View.VISIBLE
+                binding.ibCloseSuccessSaving.visibility = View.VISIBLE
+            }else{
+
+            }
         }
         binding.ibCloseSuccessSaving.setOnClickListener {
-            activity?.onBackPressed()
+            if (interstitialLoaded && mInterstitialAd != null){
+                mInterstitialAd?.show(requireActivity())
+
+            }else if(interstitialLoaded && mInterstitialAd == null){
+               // activity?.supportFragmentManager?.popBackStack()
+                Navigation.findNavController(requireView()).popBackStack()
+            }else{
+                closeButtonPressed = true
+                binding.ibCloseSuccessSaving.visibility = View.GONE
+                binding.pbCloseSuccessWallpFr.visibility = View.VISIBLE
+            }
         }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     if (!thanksPressed)
                         layoutBinding?.btnThanksSuccessSaving?.performClick()
-                    else activity?.supportFragmentManager?.popBackStack()
+                    else {
+                        //activity?.finish()
+                    }
                 }
             }
         )
@@ -91,6 +118,63 @@ class RingtoneSuccessFragment : Fragment() {
             binding.rlWallpaperSavedAdvertisiing.layoutParams = params2
             return@setOnApplyWindowInsetsListener windowInsets
         }
+    }
+    private fun loadInterAd(){
+        val adRequest = AdRequest.Builder().build()
+        InterstitialAd.load(requireContext(), testInterAd, adRequest, object : InterstitialAdLoadCallback() {
+            override fun onAdFailedToLoad(p0: LoadAdError) {
+                super.onAdFailedToLoad(p0)
+                Log.i("SplashScreen", "filed to load interstitial")
+                mInterstitialAd = null
+                interstitialLoaded = true
+                binding.ibCloseSuccessSaving.visibility = View.VISIBLE
+                binding.pbCloseSuccessWallpFr.visibility = View.GONE
+                if (closeButtonPressed){
+                    Navigation.findNavController(requireView()).popBackStack()
+                }
+            }
+
+            override fun onAdLoaded(p0: InterstitialAd) {
+                Log.i("SplashScreen", "interstitial loaded $p0")
+                super.onAdLoaded(p0)
+                mInterstitialAd = p0
+                mInterstitialAd?.fullScreenContentCallback = object: FullScreenContentCallback() {
+                    override fun onAdClicked() {
+                        // Called when a click is recorded for an ad.
+                        Log.d("SplashScreen", "Ad was clicked.")
+                    }
+
+                    override fun onAdDismissedFullScreenContent() {
+                        // Called when ad is dismissed.
+                        Log.d("SplashScreen", "Ad dismissed fullscreen content.")
+                        mInterstitialAd = null
+                      //  activity?.supportFragmentManager?.popBackStack()
+                        Navigation.findNavController(requireView()).popBackStack()
+                    }
+
+                    override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                        super.onAdFailedToShowFullScreenContent(p0)
+                        Log.d("SplashScreen", "Ad failed to show fullscreen content.")
+                        mInterstitialAd = null
+                    }
+
+                    override fun onAdImpression() {
+                        // Called when an impression is recorded for an ad.
+                        Log.d("SplashScreen", "Ad recorded an impression.")
+                    }
+
+                    override fun onAdShowedFullScreenContent() {
+                        // Called when ad is shown.
+                        Log.d("SplashScreen", "Ad showed fullscreen content.")
+                    }
+
+                }
+                interstitialLoaded = true
+                if(closeButtonPressed){
+                    mInterstitialAd?.show(requireActivity())
+                }
+            }
+        })
     }
 
     private fun loadAd(){

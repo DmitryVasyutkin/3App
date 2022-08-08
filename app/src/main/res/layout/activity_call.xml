@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible"
-        tools:visibility="gone">
+        tools:visibility="visible">
 
         <com.google.android.exoplayer2.ui.PlayerView
             android:id="@+id/incoming_call_player"
@@ -59,7 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
-        tools:visibility="visible"
+        tools:visibility="gone"
         android:background="@drawable/bg_call_activity_gradient">
 
         <ImageView
@@ -189,7 +189,7 @@
                         android:layout_alignParentEnd="true"
                         android:layout_gravity="center_horizontal"
                         android:background="@android:color/transparent"
-                        android:src="@drawable/ic_speaker_on_vector" />
+                        android:src="@drawable/ic_speaker_off_vector" />
 
                     <TextView
                         android:id="@+id/tv_inc_call_speaker"

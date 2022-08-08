@@ -4,7 +4,6 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
-    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -13,7 +12,6 @@
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
     <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
@@ -33,57 +31,59 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.3App.NoActionBar">
+        <activity
+            android:name=".ui.LiveWallpaperActivity"
+            android:exported="false" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
-
+            android:value="ca-app-pub-3940256099942544~3347511713" />
 
         <activity
             android:name=".ui.DialpadActivity"
             android:exported="true"
-            android:screenOrientation="portrait">
-
-
-        </activity>
-
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ui.CallActivity"
             android:excludeFromRecents="true"
             android:exported="true"
-            android:launchMode="singleTask"
+            android:launchMode="standard"
             android:screenOrientation="portrait"
             android:showOnLockScreen="true"
             android:theme="@style/Theme.3App.NoActionBar.TransparentStatusBar">
-
             <intent-filter>
-                <action android:name="android.intent.action.CALL" />
+                <action android:name="android.intent.action.ANSWER" />
 
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:scheme="tel" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.DIAL" />
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.DIAL" /> -->
 
-                <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:scheme="tel" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.DIAL" />
+            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
 
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.DIAL" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+            <!-- <data android:scheme="tel" /> -->
+            <!-- </intent-filter> -->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.DIAL" /> -->
 
-                <data android:scheme="tel" />
-            </intent-filter>
+
+            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+            <!-- </intent-filter> -->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.VIEW" /> -->
+            <!-- <action android:name="android.intent.action.DIAL" /> -->
+
+
+            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+            <!-- <category android:name="android.intent.category.BROWSABLE" /> -->
+
+
+            <!-- <data android:scheme="tel" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity
             android:name=".ui.SettingsActivity"
@@ -111,8 +111,6 @@
             android:fitsSystemWindows="true"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.3App.NoActionBar.TransparentStatusBar" />
-
-
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
@@ -147,23 +145,21 @@
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService" />
             </intent-filter>
-        </service>
-        <service
-            android:name=".services.CallService"
-            android:enabled="true"
-            android:exported="true"
-            android:permission="android.permission.BIND_INCALL_SERVICE">
-            <meta-data
-                android:name="android.telecom.IN_CALL_SERVICE_UI"
-                android:value="true" />
-
-            <intent-filter>
-                <action android:name="android.telecom.InCallService" />
-            </intent-filter>
-        </service>
+        </service> <!-- <service -->
+        <!-- android:name=".services.CallService" -->
+        <!-- android:enabled="true" -->
+        <!-- android:exported="true" -->
+        <!-- android:permission="android.permission.BIND_INCALL_SERVICE"> -->
+        <!-- <meta-data -->
+        <!-- android:name="android.telecom.IN_CALL_SERVICE_UI" -->
+        <!-- android:value="true" /> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="android.telecom.InCallService" /> -->
+        <!-- </intent-filter> -->
+        <!-- </service> -->
         <service
             android:name=".services.SimpleCallScreeningService"
-            android:exported="true"
+            android:exported="false"
             android:permission="android.permission.BIND_SCREENING_SERVICE">
             <intent-filter>
                 <action android:name="android.telecom.CallScreeningService" />
@@ -179,7 +175,14 @@
                 <action android:name="io.mobidoo.a3app.utils.DECLINE_CALL" />
             </intent-filter>
         </receiver>
-
+        <receiver
+            android:name=".services.CallBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.PHONE_STATE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

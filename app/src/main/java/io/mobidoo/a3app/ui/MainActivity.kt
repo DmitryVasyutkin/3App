@@ -10,6 +10,12 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationBarView
 import io.mobidoo.a3app.R
@@ -26,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     private var navHostFragment: NavHostFragment? = null
 
     private lateinit var bottomNavView: BottomNavigationView
+    private var activityWasPaused = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,5 +56,77 @@ class MainActivity : AppCompatActivity() {
 
     fun navigateToLiveWalls(){
         bottomNavView.selectedItemId = R.id.live
+    }
+    private fun loadInterAd(){
+        val adRequest = AdRequest.Builder().build()
+        InterstitialAd.load(this, testInterAd, adRequest, object : InterstitialAdLoadCallback() {
+            override fun onAdFailedToLoad(p0: LoadAdError) {
+                super.onAdFailedToLoad(p0)
+                Log.i("SplashScreen", "filed to load interstitial")
+
+            }
+
+            override fun onAdLoaded(p0: InterstitialAd) {
+                Log.i("SplashScreen", "interstitial loaded $p0")
+                super.onAdLoaded(p0)
+                p0.fullScreenContentCallback = object: FullScreenContentCallback() {
+                    override fun onAdClicked() {
+                        // Called when a click is recorded for an ad.
+                        Log.d("SplashScreen", "Ad was clicked.")
+                    }
+
+                    override fun onAdDismissedFullScreenContent() {
+                        // Called when ad is dismissed.
+                        Log.d("SplashScreen", "Ad dismissed fullscreen content.")
+                        activityWasPaused = false
+                    }
+
+                    override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                        super.onAdFailedToShowFullScreenContent(p0)
+                        Log.d("SplashScreen", "Ad failed to show fullscreen content.")
+
+                    }
+
+                    override fun onAdImpression() {
+                        // Called when an impression is recorded for an ad.
+                        Log.d("SplashScreen", "Ad recorded an impression.")
+                    }
+
+                    override fun onAdShowedFullScreenContent() {
+                        // Called when ad is shown.
+                        Log.d("SplashScreen", "Ad showed fullscreen content.")
+                    }
+
+                }
+
+                if(activityWasPaused) p0.show(this@MainActivity)
+            }
+        })
+    }
+
+    override fun onPause() {
+        Log.d("MainActivity", "onPause")
+        activityWasPaused = true
+        super.onPause()
+    }
+
+    override fun onStop() {
+        Log.d("MainActivity", "onStop")
+        super.onStop()
+    }
+
+    override fun onStart() {
+        Log.d("MainActivity", "onStart")
+        super.onStart()
+    }
+
+    override fun onResume() {
+        Log.d("MainActivity", "onResume")
+        super.onResume()
+    }
+    override fun onRestart() {
+        Log.d("MainActivity", "onRestart")
+        if(activityWasPaused) loadInterAd()
+        super.onRestart()
     }
 }

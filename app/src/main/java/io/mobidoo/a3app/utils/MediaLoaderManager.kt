@@ -10,10 +10,14 @@ import android.os.Environment
 import android.os.ParcelFileDescriptor
 import android.provider.MediaStore
 import android.util.Log
+import androidx.lifecycle.lifecycleScope
 import io.mobidoo.a3app.R
+import io.mobidoo.a3app.adapters.RingtoneApp
+import io.mobidoo.a3app.ui.ringtone.RingtoneCategoryItemsFragment
 import io.mobidoo.a3app.utils.AppUtils.createFullLink
 import io.mobidoo.domain.entities.ringtone.Ringtone
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.*
 import java.net.URL
@@ -40,6 +44,41 @@ class MediaLoadManager(
                     put(MediaStore.Images.Media.DISPLAY_NAME, url.getFileName())
                     put(MediaStore.Images.Media.RELATIVE_PATH, relativeLocation)
                     put(MediaStore.Images.Media.IS_PENDING, 1)
+                }
+
+                val projection = arrayOf(
+                    MediaStore.Images.Media._ID,
+                    MediaStore.Images.Media.SIZE,
+                    MediaStore.Images.Media.DATE_TAKEN,
+                    MediaStore.Images.Media.RELATIVE_PATH,
+                    MediaStore.Images.Media.DISPLAY_NAME,
+                    MediaStore.MediaColumns.DATA
+                )
+                val selection = "${MediaStore.Images.Media.RELATIVE_PATH} like ?"
+                val selectionArgs = arrayOf(
+                    "%$relativeLocation%"
+                )
+                val sortOrder = null
+                contentResolver.query(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    sortOrder
+                )?.use{ cursor ->
+                    val columnName = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME)
+                    val columnData = cursor.getColumnIndex(MediaStore.MediaColumns.DATA)
+                    Log.i("MediaLoader", "fileName ${url.getFileName()}")
+                    while (cursor.moveToNext()){
+                        val fileName = cursor.getString(columnName)
+                        Log.i("MediaLoader", "file uri ${cursor.getString(columnData)}")
+                        Log.i("MediaLoader", "fileName existed $fileName")
+                        if (fileName == url.getFileName()){
+                            listener?.success(cursor.getString(columnData))
+                            return@withContext
+                        }
+                    }
+                    cursor.close()
                 }
 
                 val contentUri = contentResolver.insert(imageCollection, contentDetails)
@@ -82,8 +121,13 @@ class MediaLoadManager(
         if (!outDir.exists()){
             outDir.mkdirs()
         }
-
         var newFile = File(outDir, url.getFileName())
+
+        if (newFile.exists()){
+            listener?.success(newFile.absolutePath)
+            return
+        }
+
         var inputStream: InputStream? = null
         var output: OutputStream? = null
         var count = 0
@@ -118,10 +162,43 @@ class MediaLoadManager(
                 val relativeLocation = if (!isFlashCall)
                     "${Environment.DIRECTORY_PICTURES}/${resources.getString(R.string.app_name)}/${resources.getString(R.string.live_)}/$subFolder"
                 else "${Environment.DIRECTORY_PICTURES}/${resources.getString(R.string.app_name)}/${resources.getString(R.string.flash_calls)}"
+
                 val contentDetails = ContentValues().apply {
                     put(MediaStore.Video.Media.DISPLAY_NAME, url.getFileName())
                     put(MediaStore.Video.Media.RELATIVE_PATH, relativeLocation)
                     put(MediaStore.Video.Media.IS_PENDING, 1)
+                }
+
+                val projection = arrayOf(
+                    MediaStore.Video.Media.RELATIVE_PATH,
+                    MediaStore.Video.Media.DISPLAY_NAME,
+                    MediaStore.MediaColumns.DATA
+                )
+                val selection = "${MediaStore.Video.Media.RELATIVE_PATH} like ?"
+                val selectionArgs = arrayOf(
+                    "%$relativeLocation%"
+                )
+                val sortOrder = null
+                contentResolver.query(
+                    MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    sortOrder
+                )?.use{ cursor ->
+                    val columnName = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME)
+                    val columnData = cursor.getColumnIndex(MediaStore.MediaColumns.DATA)
+                    Log.i("MediaLoader", "fileName ${url.getFileName()}")
+                    while (cursor.moveToNext()){
+                        val fileName = cursor.getString(columnName)
+                        Log.i("MediaLoader", "file uri ${cursor.getString(columnData)}")
+                        Log.i("MediaLoader", "fileName existed $fileName")
+                        if (fileName == url.getFileName()){
+                            listener?.success(cursor.getString(columnData))
+                            return@withContext
+                        }
+                    }
+                    cursor.close()
                 }
 
                 val contentUri = contentResolver.insert(imageCollection, contentDetails)
@@ -164,6 +241,11 @@ class MediaLoadManager(
         }
 
         var newFile = File(outDir, url.getFileName())
+        if (newFile.exists()){
+            listener?.success(newFile.absolutePath)
+            return
+        }
+
         var inputStream: InputStream? = null
         var output: OutputStream? = null
         var count = 0
@@ -208,6 +290,38 @@ class MediaLoadManager(
                     put(MediaStore.Audio.Media.IS_PENDING, 1)
                 }
 
+                val projection = arrayOf(
+                    MediaStore.Audio.Media.RELATIVE_PATH,
+                    MediaStore.Audio.Media.DISPLAY_NAME,
+                    MediaStore.MediaColumns.DATA
+                )
+                val selection = "${MediaStore.Audio.Media.RELATIVE_PATH} like ?"
+                val selectionArgs = arrayOf(
+                    "%$relativeLocation%"
+                )
+                val sortOrder = null
+                contentResolver.query(
+                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    sortOrder
+                )?.use{ cursor ->
+                    val columnName = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
+                    val columnData = cursor.getColumnIndex(MediaStore.MediaColumns.DATA)
+                    Log.i("MediaLoader", "fileName ${url.getFileName()}")
+                    while (cursor.moveToNext()){
+                        val fileName = cursor.getString(columnName)
+                        Log.i("MediaLoader", "file uri ${cursor.getString(columnData)}")
+                        Log.i("MediaLoader", "fileName existed $fileName")
+                        if (fileName == url.getFileName()){
+                            listener?.success(cursor.getString(columnData))
+                            return@withContext
+                        }
+                    }
+                    cursor.close()
+                }
+
                 val contentUri = contentResolver.insert(imageCollection, contentDetails)
                 contentUri?.let {
                     var input: InputStream? = null
@@ -249,6 +363,10 @@ class MediaLoadManager(
         }
 
         var newFile = File(outDir, url.getFileName())
+        if (newFile.exists()){
+            listener?.success(newFile.absolutePath)
+            return
+        }
         var inputStream: InputStream? = null
         var output: OutputStream? = null
         var count = 0
@@ -272,6 +390,99 @@ class MediaLoadManager(
             IOUtils.closeQuietly(inputStream)
             IOUtils.closeQuietly(output)
         }
+    }
+
+    suspend fun isRingtoneExists(ringtoneApp: RingtoneApp, subFolder: String): String?{
+        var result: String? = null
+        withContext(Dispatchers.IO){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+
+                val relativeLocation = "${Environment.DIRECTORY_RINGTONES}/${resources.getString(R.string.app_name)}/$subFolder"
+
+                val projection = arrayOf(
+                    MediaStore.Audio.Media.RELATIVE_PATH,
+                    MediaStore.Audio.Media.DISPLAY_NAME,
+                    MediaStore.MediaColumns.DATA
+                )
+                val selection = "${MediaStore.Audio.Media.RELATIVE_PATH} like ?"
+                val selectionArgs = arrayOf(
+                    "%$relativeLocation%"
+                )
+                val sortOrder = null
+                contentResolver.query(
+                    MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    sortOrder
+                )?.use{ cursor ->
+                    val columnName = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
+                    val columnData = cursor.getColumnIndex(MediaStore.MediaColumns.DATA)
+                    Log.i("MediaLoader", "fileName ${ringtoneApp.url.getFileName()}")
+                    while (cursor.moveToNext()){
+                        val fileName = cursor.getString(columnName)
+                        Log.i("MediaLoader", "file uri ${cursor.getString(columnData)}")
+                        Log.i("MediaLoader", "fileName existed $fileName")
+                        if (fileName == ringtoneApp.url.getFileName()){
+                            result = cursor.getString(columnData)
+                            return@withContext result
+                        }
+                    }
+                    cursor.close()
+                }
+
+
+            }else{
+                val extDir =
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_RINGTONES).absolutePath
+                val outDir = File(extDir + File.separator + resources.getString(R.string.app_name) +  File.separator + subFolder)
+
+                var newFile = File(outDir, ringtoneApp.url.getFileName())
+                if (newFile.exists()){
+                    result = newFile.absolutePath
+                    return@withContext result
+                }else {
+                    return@withContext null
+                }
+            }
+        }
+        return result
+    }
+
+    suspend fun getRingtoneTitle(ringtoneUri: Uri, folder: String): String{
+        var result = ""
+        withContext(Dispatchers.IO){
+
+                val relativeLocation = "${Environment.DIRECTORY_RINGTONES}/${resources.getString(R.string.app_name)}/$folder"
+                val projection = arrayOf(
+                    MediaStore.Audio.Media.DISPLAY_NAME,
+                    MediaStore.MediaColumns.DATA
+                )
+//                val selection = "${MediaStore.Audio.Media.RELATIVE_PATH} like ?"
+//                val selectionArgs = arrayOf(
+//                    "%$relativeLocation%"
+//                )
+                val sortOrder = null
+                contentResolver.query(
+                    ringtoneUri,
+                    projection,
+                    null,
+                    null,
+                    sortOrder
+                )?.use{ cursor ->
+                    val columnName = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
+                    while (cursor.moveToNext()){
+
+                        val fileName = cursor.getString(columnName)
+                        Log.i("MediaLoaderManager", "fileName = $fileName")
+                        result = fileName
+                        return@withContext result
+                    }
+                    cursor.close()
+                }
+
+        }
+        return result
     }
 
     suspend fun extractAudio(context: Context, videoUri: String, action: (String) -> Unit){
@@ -310,5 +521,5 @@ fun String.getFileName() : String{
 }
 interface FileDownloaderListener{
     suspend fun success(path: String)
-    fun error(message: String)
+    suspend fun error(message: String)
 }
