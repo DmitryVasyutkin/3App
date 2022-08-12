@@ -308,7 +308,7 @@ class FlashCallPreviewFragment : Fragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == REQUEST_CODE_SET_DEFAULT_DIALER){
             if (resultCode == Activity.RESULT_OK){
-                Toast.makeText(requireContext(), "Flash call installed", Toast.LENGTH_SHORT).show()
+              //  Toast.makeText(requireContext(), "Flash call installed", Toast.LENGTH_SHORT).show()
             }
             if (systemPermissionsGranted()){
                 setDefualtRingtoneAndShowAd()

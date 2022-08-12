@@ -2,6 +2,7 @@ package io.mobidoo.a3app.ui.ringtone
 
 import android.Manifest
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -298,10 +299,14 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
         Log.i(TAG, "ringt downloaded $ringExist")
         if (ringExist != null){
             withContext(Dispatchers.Main){
+                actionBinding.btnDownloadRingtone.text = resources.getString(R.string.listen)
                 setSuccessButtonIcon(actionBinding.btnDownloadRingtone)
             }
         }else{
-            setDefaultButtonIcon(actionBinding.btnDownloadRingtone)
+            withContext(Dispatchers.Main){
+                actionBinding.btnDownloadRingtone.text = resources.getString(R.string.download)
+                setDefaultButtonIcon(actionBinding.btnDownloadRingtone)
+            }
         }
     }
 
@@ -631,11 +636,26 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
                         withContext(Dispatchers.Main){
                             val downloadedPath = "${Environment.DIRECTORY_RINGTONES}/${resources.getString(R.string.app_name)}/$name"
                             dialogLoadedFragment = RingtoneDownloadedDialog({
-                                val intent = Intent().apply {
-                                    setAction(android.content.Intent.ACTION_VIEW)
-                                    setDataAndType(Uri.parse(ringExist), "audio/*")
+                                try{
+                                    val intent = Intent().apply {
+                                        setAction(android.content.Intent.ACTION_VIEW)
+                                        setDataAndType(Uri.parse(ringExist), "audio/*")
+                                    }
+                                    startActivity(intent)
+                                }catch (e: Exception){
+                                    if(e is ActivityNotFoundException){
+                                        try{
+                                            val intent = Intent().apply {
+                                                setAction(android.content.Intent.ACTION_VIEW)
+                                                setDataAndType(Uri.parse(ringExist), "video/*")
+                                            }
+                                            startActivity(intent)
+                                        }catch (e: Exception){
+
+                                        }
+                                    }
                                 }
-                                startActivity(intent)
+
                             }, currentPlayingRingtone!!, downloadedPath)
 
                             dialogLoadedFragment?.show(activity?.supportFragmentManager?.beginTransaction()!!, "downloaded_dialog")
@@ -861,12 +881,13 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
                                 dialogLoadedFragment = RingtoneDownloadedDialog({
                                     val intent = Intent().apply {
                                         setAction(android.content.Intent.ACTION_VIEW)
-                                        setDataAndType(Uri.parse(path), "audio/*")
+                                        setDataAndType(Uri.parse(path), "audio/mp3")
                                     }
                                     startActivity(intent)
                                 }, currentPlayingRingtone!!, downloadedPath)
 
-                                dialogLoadedFragment?.show(activity?.supportFragmentManager?.beginTransaction()!!, "downloaded_dialog")
+                            //    dialogLoadedFragment?.show(activity?.supportFragmentManager?.beginTransaction()!!, "downloaded_dialog")
+                                handleSuccessSaving()
                             }
                         }
 
