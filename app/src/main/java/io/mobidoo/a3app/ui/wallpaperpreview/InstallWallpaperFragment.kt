@@ -168,39 +168,6 @@ class InstallWallpaperFragment : Fragment() {
         }
     }
 
-    private fun showAdvertising() {
-
-    }
-
-    private fun loadAd(){
-        val builder = AdLoader.Builder(requireContext(), BuildConfig.AD_MOB_KEY)
-            .forNativeAd { nativeAd ->
-                val adView = layoutInflater.inflate(R.layout.layout_ad_wall_preview, null) as NativeAdView
-
-                adView.findViewById<TextView>(R.id.ad_headline_wallP).text = nativeAd.headline
-                adView.findViewById<ImageView>(R.id.ad_app_icon_wallP).load(nativeAd.icon?.drawable)
-                if (!previewShowing)
-                    showAdvertising()
-                Log.i("WallpaperActionFragment", "nativeAd $nativeAd")
-                if(isDetached){
-                    nativeAd.destroy()
-                    return@forNativeAd
-                }
-            }
-            .withAdListener(object : AdListener(){
-                override fun onAdFailedToLoad(p0: LoadAdError) {
-                    if (!previewShowing)
-                        showAdvertising()
-                    Log.i("WallpaperActionFragment", "nativeAd failed ${p0.message}")
-                }
-            })
-            .build()
-        val request = AdRequest.Builder()
-            .build()
-        Log.i("WallpaperActionFragment", "is Test device ${request.isTestDevice(requireContext())}")
-        builder.loadAds(request, 10)
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.i("InstallWall", "requestCode $requestCode")

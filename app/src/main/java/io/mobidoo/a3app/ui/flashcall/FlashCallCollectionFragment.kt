@@ -25,6 +25,7 @@ import io.mobidoo.a3app.ui.FlashCallPreviewActivity
 import io.mobidoo.a3app.ui.startfragment.stop
 import io.mobidoo.a3app.utils.AppUtils
 import io.mobidoo.a3app.utils.AppUtils.createFullLink
+import io.mobidoo.a3app.utils.Constants.nativeAdKeyList
 import io.mobidoo.a3app.viewmodels.MainActivityViewModel
 import io.mobidoo.a3app.viewmodels.MainActivityViewModelFactory
 import io.mobidoo.a3app.viewmodels.WallCategoriesViewModel
@@ -44,6 +45,8 @@ class FlashCallCollectionFragment : Fragment() {
     @Inject lateinit var factory: WallCategoriesViewModelFactory
     private lateinit var viewModel: WallCategoriesViewModel
 
+    private var adsCount = 0
+    private var loadNativeAdAttempt = 0
     override fun onAttach(context: Context) {
         (activity?.application as Injector).createWallpaperSubComponent().inject(this)
         viewModel = ViewModelProvider(viewModelStore, factory)[WallCategoriesViewModel::class.java]
@@ -61,7 +64,7 @@ class FlashCallCollectionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        loadNativeAdAttempt = 0
         recyclerItemAdapter = FlashCallRecyclerItemAdapter {
             openFlashCall(it)
         }
@@ -82,14 +85,15 @@ class FlashCallCollectionFragment : Fragment() {
                     binding.shimmerFlashCallWallpapers.stop()
                 }
                 val list = createList(it.array)
-                loadAds(list.size /(Constants.AD_FREQUENCY_WALLPAPERS *3))
+                adsCount = list.size /(Constants.AD_FREQUENCY_WALLPAPERS *3)
+                loadAds(adsCount, nativeAdKeyList[loadNativeAdAttempt])
                 recyclerItemAdapter.setList(list)
             }
         }
     }
-    private fun loadAds(count: Int){
+    private fun loadAds(count: Int, key: String){
         Log.i("FlashCall", "loadAds count $count")
-        val builder = AdLoader.Builder(requireContext(), BuildConfig.AD_MOB_KEY)
+        val builder = AdLoader.Builder(requireContext(), key)
             .forNativeAd { nativeAd ->
 
                 if(isDetached){
@@ -100,15 +104,14 @@ class FlashCallCollectionFragment : Fragment() {
                 recyclerItemAdapter.setNativeAd(nativeAd)
             }
             .withAdListener(object : AdListener(){
-                override fun onAdLoaded() {
-                    super.onAdLoaded()
-
-                    Log.i("FlashCall", "onAdLoaded")
-                }
 
                 override fun onAdFailedToLoad(p0: LoadAdError) {
 
-                    Log.i("FlashCall", "nativeAd failed ${p0.message}")
+                    Log.i("FlashCall", "nativeAd failed ${p0.message}, attempt $loadNativeAdAttempt")
+                    loadNativeAdAttempt++
+                    if(loadNativeAdAttempt <= nativeAdKeyList.size - 1){
+                        loadAds(adsCount, nativeAdKeyList[loadNativeAdAttempt])
+                    }
                 }
             })
             .build()

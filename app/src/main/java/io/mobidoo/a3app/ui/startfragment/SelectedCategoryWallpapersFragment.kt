@@ -27,9 +27,10 @@ import io.mobidoo.a3app.di.Injector
 import io.mobidoo.a3app.ui.WallpaperActivity
 import io.mobidoo.a3app.ui.startfragment.StartCollectionFragment
 import io.mobidoo.a3app.ui.startfragment.stop
-import io.mobidoo.a3app.ui.testInterAd
+
 import io.mobidoo.a3app.ui.wallpaperpreview.WallpaperPreviewFragment
 import io.mobidoo.a3app.utils.AppUtils.getWallpaperTypeFromLink
+import io.mobidoo.a3app.utils.Constants.nativeAdKeyList
 import io.mobidoo.a3app.viewmodels.WallCategoriesViewModel
 import io.mobidoo.a3app.viewmodels.WallCategoriesViewModelFactory
 import io.mobidoo.domain.common.Constants
@@ -62,6 +63,9 @@ class SelectedCategoryWallpapersFragment : Fragment(){
     private var interIsShowing = false
     private var selectedWallpaperItemUrl: String? = null
 
+    private var loadNativeAdAttempt = 0
+    private var nativeAdsCount = 0
+
     override fun onAttach(context: Context) {
         (activity?.application as Injector).createWallpaperSubComponent().inject(this)
         viewModel = ViewModelProvider(viewModelStore, factory)[WallCategoriesViewModel::class.java]
@@ -81,20 +85,12 @@ class SelectedCategoryWallpapersFragment : Fragment(){
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        loadInterAd()
         binding.tvWallpapersCategoryName.text = arguments?.getString(StartCollectionFragment.ARG_NAME)
 
         wallpapersAdapter = WallpaperRecyclerItemAdapter(){
-//            selectedWallpaperItemUrl = it
-//            if (interstitialLoaded && mInterstitialAd != null){
-//                interIsShowing = true
-//                mInterstitialAd?.show(requireActivity())
-//            }else if(interstitialLoaded && mInterstitialAd == null){
-//                startActivity(
-//                    WallpaperActivity.getIntent(requireActivity(), it, resources.getString(R.string.common_folder), getWallpaperTypeFromLink(it)))
-//            }
             startActivity(WallpaperActivity.getIntent(requireActivity(), it, arguments?.getString(StartCollectionFragment.ARG_NAME)!!, getWallpaperTypeFromLink(it)) )
         }
+        loadNativeAdAttempt = 0
         lifecycleScope.launch {
             viewModel.wallUiStateFlow.collect(){
                 if(!it.isLoading){
@@ -102,7 +98,8 @@ class SelectedCategoryWallpapersFragment : Fragment(){
                 }
                 wallpapersAdapter?.setList(createList(it.array))
                 arraySize = it.array.size
-                loadAds(it.array.size / (Constants.AD_FREQUENCY_WALLPAPERS * 3))
+                nativeAdsCount = it.array.size / (Constants.AD_FREQUENCY_WALLPAPERS * 3)
+                loadAds(nativeAdsCount, nativeAdKeyList[loadNativeAdAttempt])
             }
         }
         binding.ibBackWallpapers.setOnClickListener {
@@ -115,68 +112,13 @@ class SelectedCategoryWallpapersFragment : Fragment(){
         arguments?.getString(StartCollectionFragment.ARG_LINK)?.let { viewModel.getWallpapers(it) }
     }
 
-    private fun loadInterAd(){
-        val adRequest = AdRequest.Builder().build()
-        InterstitialAd.load(requireContext(), testInterAd, adRequest, object : InterstitialAdLoadCallback() {
-            override fun onAdFailedToLoad(p0: LoadAdError) {
-                super.onAdFailedToLoad(p0)
-                Log.i("SplashScreen", "filed to load interstitial")
-                mInterstitialAd = null
-                interstitialLoaded = true
 
-            }
+    private fun loadAds(count: Int, key: String){
 
-            override fun onAdLoaded(p0: InterstitialAd) {
-                Log.i("SplashScreen", "interstitial loaded $p0")
-                super.onAdLoaded(p0)
-                mInterstitialAd = p0
-                mInterstitialAd?.fullScreenContentCallback = object: FullScreenContentCallback() {
-                    override fun onAdClicked() {
-                        // Called when a click is recorded for an ad.
-                        Log.d("SplashScreen", "Ad was clicked.")
-                    }
-
-                    override fun onAdDismissedFullScreenContent() {
-                        // Called when ad is dismissed.
-                        Log.d("SplashScreen", "Ad dismissed fullscreen content.")
-                        mInterstitialAd = null
-                        startActivity(
-                            WallpaperActivity.getIntent(requireActivity(),
-                                selectedWallpaperItemUrl!!,
-                                resources.getString(R.string.common_folder),
-                                getWallpaperTypeFromLink(selectedWallpaperItemUrl!!)))
-                    }
-
-                    override fun onAdFailedToShowFullScreenContent(p0: AdError) {
-                        super.onAdFailedToShowFullScreenContent(p0)
-                        Log.d("SplashScreen", "Ad failed to show fullscreen content.")
-                        mInterstitialAd = null
-                    }
-
-                    override fun onAdImpression() {
-                        // Called when an impression is recorded for an ad.
-                        Log.d("SplashScreen", "Ad recorded an impression.")
-                    }
-
-                    override fun onAdShowedFullScreenContent() {
-                        // Called when ad is shown.
-                        Log.d("SplashScreen", "Ad showed fullscreen content.")
-                    }
-
-                }
-                interstitialLoaded = true
-                if(!interIsShowing){
-                    mInterstitialAd?.show(requireActivity())
-                }
-            }
-        })
-    }
-    private fun loadAds(count: Int){
-        Log.i("SelectedCategory", "loadAds count $count")
         nativeAds.forEach {
             it.destroy()
         }
-        val builder = AdLoader.Builder(requireContext(), BuildConfig.AD_MOB_KEY)
+        val builder = AdLoader.Builder(requireContext(), key)
             .forNativeAd { nativeAd ->
 
                 if(isDetached){
@@ -188,15 +130,14 @@ class SelectedCategoryWallpapersFragment : Fragment(){
                 wallpapersAdapter?.setNativeAd(nativeAd)
             }
             .withAdListener(object : AdListener(){
-                override fun onAdLoaded() {
-                    super.onAdLoaded()
-
-                    Log.i("SelectedCategory", "onAdLoaded")
-                }
 
                 override fun onAdFailedToLoad(p0: LoadAdError) {
 
-                    Log.i("SelectedCategory", "nativeAd failed ${p0.message}")
+                    Log.i("SelectedCategory", "nativeAd failed ${p0.message}, attempt $loadNativeAdAttempt")
+                    loadNativeAdAttempt++
+                    if (loadNativeAdAttempt <= io.mobidoo.a3app.utils.Constants.nativeAdKeyList.size - 1){
+                        loadAds(nativeAdsCount, io.mobidoo.a3app.utils.Constants.nativeAdKeyList[loadNativeAdAttempt])
+                    }
                 }
             })
             .build()

@@ -15,7 +15,6 @@ android {
         versionName rootProject.ext.version_name
 
         buildConfigField "String","BASE_URL","\"http://188.166.114.39\""
-        buildConfigField "String","AD_MOB_KEY","\"ca-app-pub-3940256099942544/2247696110\""
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

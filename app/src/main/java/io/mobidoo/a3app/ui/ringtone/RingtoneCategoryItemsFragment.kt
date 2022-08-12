@@ -64,6 +64,7 @@ import io.mobidoo.a3app.ui.bottomsheet.RingtoneDownloadedDialog
 import io.mobidoo.a3app.ui.wallpaperpreview.WallpaperPreviewFragment
 import io.mobidoo.a3app.ui.wallpaperpreview.WallpaperPreviewSuccessFragment
 import io.mobidoo.a3app.utils.AppUtils.createFullLink
+import io.mobidoo.a3app.utils.Constants.nativeAdKeyList
 import io.mobidoo.a3app.utils.FileDownloaderListener
 import io.mobidoo.a3app.utils.MediaLoadManager
 import io.mobidoo.a3app.utils.getFileName
@@ -123,6 +124,9 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
 
     private var dialogLoadedFragment: RingtoneDownloadedDialog? = null
 
+    private var adsCount = 0
+    private var loadNativeAdAttempt = 0
+
     override fun onAttach(context: Context) {
         ((activity as RingtoneCategoryItemsActivity).application as Injector).createRingtoneSubComponent().inject(this)
         viewModel = ViewModelProvider(viewModelStore, factory)[RingtonesViewModel::class.java]
@@ -142,9 +146,6 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.i("RingtonePermission", "onViewCreated")
-        Log.i("RingtonePermission", "actionLayoutShown $actionLayoutShown")
-        Log.i("RingtonePermission", "currentPlayingRingtone $currentPlayingRingtone")
         link = requireActivity().intent?.extras?.getString(RingtoneCategoryItemsActivity.EXTRA_RINGTONE_LINK).toString()
         name = requireActivity().intent?.extras?.getString(RingtoneCategoryItemsActivity.EXTRA_RINGTONE_CATEGORY_NAME).toString()
         if (requireActivity().intent?.extras?.getSerializable(RingtoneCategoryItemsActivity.EXTRA_RINGTONE) != null){
@@ -166,7 +167,7 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
         actionBinding.btnSetAsAlarm.setOnClickListener(this)
         actionBinding.btnDownloadRingtone.setOnClickListener(this)
         initializeRingtoneRecycler()
-
+        loadNativeAdAttempt = 0
         collectUIState()
 
         viewModel.getRingtones(link)
@@ -513,7 +514,8 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
             binding.ivRingtonesCategoryControl.load(createFullLink(ringtone.imageUrl))
             binding.tvRingtoneTitle1Control.text = ringtone.title
             binding.tvRingtoneTitle2Control.text = ringtone.url.split("/").last().split(".").last()
-            loadAds(uiState.ringtones.size / (Constants.AD_FREQUENCY_RINGTONES))
+            adsCount = uiState.ringtones.size / (Constants.AD_FREQUENCY_RINGTONES)
+            loadAds(adsCount, nativeAdKeyList[loadNativeAdAttempt])
             lifecycleScope.launch {
                 checkIfRingtoneIsDefault(currentPlayingRingtone?.toRingtoneApp()!!)
             }
@@ -523,9 +525,9 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
         ringtonesAdapter.setList(createList(uiState.ringtones).map { it.toRingtoneApp() })
     }
 
-    private fun loadAds(count: Int){
+    private fun loadAds(count: Int, key: String){
         Log.i("Ringtones", "loadAds count $count")
-        val builder = AdLoader.Builder(requireContext(), BuildConfig.AD_MOB_KEY)
+        val builder = AdLoader.Builder(requireContext(), key)
             .forNativeAd { nativeAd ->
 
                 if(isDetached){
@@ -536,15 +538,12 @@ class RingtoneCategoryItemsFragment : Fragment(), View.OnClickListener {
                 ringtonesAdapter.setNativeAd(nativeAd)
             }
             .withAdListener(object : AdListener(){
-                override fun onAdLoaded() {
-                    super.onAdLoaded()
-
-                    Log.i("Ringtones", "onAdLoaded")
-                }
-
                 override fun onAdFailedToLoad(p0: LoadAdError) {
-
-                    Log.i("Ringtones", "nativeAd failed ${p0.message}")
+                    Log.i("Ringtones", "nativeAd failed ${p0.message}, attempt $loadNativeAdAttempt")
+                    loadNativeAdAttempt++
+                    if (loadNativeAdAttempt <= nativeAdKeyList.size - 1){
+                        loadAds(adsCount, nativeAdKeyList[loadNativeAdAttempt])
+                    }
                 }
             })
             .build()

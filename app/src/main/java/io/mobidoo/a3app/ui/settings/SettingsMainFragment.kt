@@ -3,6 +3,7 @@ package io.mobidoo.a3app.ui.settings
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,11 +20,15 @@ import io.mobidoo.a3app.databinding.FragmentRingtonesBinding
 import io.mobidoo.a3app.databinding.FragmentSettingsMainBinding
 import io.mobidoo.a3app.databinding.LayoutAdCollectionsBinding
 import io.mobidoo.a3app.databinding.LayoutAdSuccessSavingBinding
+import io.mobidoo.a3app.utils.Constants
+import io.mobidoo.a3app.utils.Constants.nativeAdKeyList
 
 class SettingsMainFragment : Fragment(), View.OnClickListener {
 
     private var _binding: FragmentSettingsMainBinding? = null
     private val binding get() = _binding!!
+
+    private var loadNativeAdAttempt = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,7 +41,7 @@ class SettingsMainFragment : Fragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        loadNativeAdAttempt = 0
         binding.ibBackMainSettings.setOnClickListener(this)
         binding.btnSettingsUseCond.setOnClickListener(this)
         binding.btnSettingsPrivacy.setOnClickListener(this)
@@ -44,11 +49,11 @@ class SettingsMainFragment : Fragment(), View.OnClickListener {
         binding.btnSettingsRateUs.setOnClickListener(this)
         binding.btnSettingsInvite.setOnClickListener(this)
         binding.btnSettingsClearCache.setOnClickListener(this)
-        loadAd()
+        loadAd(nativeAdKeyList[loadNativeAdAttempt])
 
     }
-    private fun loadAd(){
-        val builder = AdLoader.Builder(requireContext(), BuildConfig.AD_MOB_KEY)
+    private fun loadAd(key: String){
+        val builder = AdLoader.Builder(requireContext(), key)
             .forNativeAd { nativeAd ->
 
                 try{
@@ -60,9 +65,9 @@ class SettingsMainFragment : Fragment(), View.OnClickListener {
                         LayoutAdCollectionsBinding.inflate(
                             it
                         )
-                    }!!
-                    populateNativeAdView(nativeAd, adBinding)
-                    binding.adViewSettings.addView(adBinding.root)
+                    }
+                    adBinding?.let { populateNativeAdView(nativeAd, it) }
+                    binding.adViewSettings.addView(adBinding?.root)
                 }catch (e:Exception){
 
                 }
@@ -70,7 +75,11 @@ class SettingsMainFragment : Fragment(), View.OnClickListener {
             }
             .withAdListener(object : AdListener(){
                 override fun onAdFailedToLoad(p0: LoadAdError) {
-
+                    Log.i("SettingsFragment", "failed to load native ad attempt $loadNativeAdAttempt")
+                    loadNativeAdAttempt++
+                    if (loadNativeAdAttempt <= nativeAdKeyList.size - 1){
+                        loadAd(nativeAdKeyList[loadNativeAdAttempt])
+                    }
                 }
             })
             .build()
@@ -88,10 +97,10 @@ class SettingsMainFragment : Fragment(), View.OnClickListener {
             binding.btnSettingsPrivacy ->{}
             binding.btnSettingsSupport ->{}
             binding.btnSettingsRateUs ->{
-                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + resources.getString(R.string.app_name))))
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(Constants.shareLink)))
             }
             binding.btnSettingsInvite ->{
-                val link = "play.google,com/SOME_LINK"
+                val link = Constants.shareLink
                 val intent = Intent(Intent.ACTION_SEND).apply {
                     type = "text/plain"
                     putExtra(Intent.EXTRA_TEXT, link)

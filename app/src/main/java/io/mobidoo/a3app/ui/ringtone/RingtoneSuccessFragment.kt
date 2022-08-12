@@ -23,7 +23,9 @@ import io.mobidoo.a3app.R
 import io.mobidoo.a3app.databinding.FragmentWallpaperSuccessBinding
 import io.mobidoo.a3app.databinding.LayoutAdSuccessSavingBinding
 import io.mobidoo.a3app.databinding.LayoutWallpaperSavedBinding
-import io.mobidoo.a3app.ui.testInterAd
+
+import io.mobidoo.a3app.utils.Constants.interAdKeyList
+import io.mobidoo.a3app.utils.Constants.nativeAdKeyList
 
 class RingtoneSuccessFragment : Fragment() {
     companion object{
@@ -42,6 +44,9 @@ class RingtoneSuccessFragment : Fragment() {
     private var closeButtonPressed = false
     private var thanksPressed = false
 
+    private var loadNativeAdAttempt = 0
+    private var loadInterAdAttempt = 0
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -55,8 +60,10 @@ class RingtoneSuccessFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setInsets(view)
-        loadInterAd()
-        loadAd()
+        loadNativeAdAttempt = 0
+        loadInterAdAttempt = 0
+        loadInterAd(interAdKeyList[loadInterAdAttempt])
+        loadAd(nativeAdKeyList[loadNativeAdAttempt])
         val value = arguments?.getString(ARG_SAVED_VALUE)
         val tvSavedValue = view.findViewById<TextView>(R.id.greeting_layoutHeader1)
         tvSavedValue.text = String.format(resources.getString(R.string.successfullySavedWallpaper), value)
@@ -119,18 +126,24 @@ class RingtoneSuccessFragment : Fragment() {
             return@setOnApplyWindowInsetsListener windowInsets
         }
     }
-    private fun loadInterAd(){
+
+    private fun loadInterAd(key : String){
         val adRequest = AdRequest.Builder().build()
-        InterstitialAd.load(requireContext(), testInterAd, adRequest, object : InterstitialAdLoadCallback() {
+        InterstitialAd.load(requireContext(), key, adRequest, object : InterstitialAdLoadCallback() {
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 super.onAdFailedToLoad(p0)
-                Log.i("SplashScreen", "filed to load interstitial")
-                mInterstitialAd = null
-                interstitialLoaded = true
-                binding.ibCloseSuccessSaving.visibility = View.VISIBLE
-                binding.pbCloseSuccessWallpFr.visibility = View.GONE
-                if (closeButtonPressed){
-                    Navigation.findNavController(requireView()).popBackStack()
+                Log.i("SplashScreen", "filed to load interstitial attempt $loadInterAdAttempt")
+                loadInterAdAttempt++
+                if (loadInterAdAttempt > interAdKeyList.size - 1){
+                    mInterstitialAd = null
+                    interstitialLoaded = true
+                    binding.ibCloseSuccessSaving.visibility = View.VISIBLE
+                    binding.pbCloseSuccessWallpFr.visibility = View.GONE
+                    if (closeButtonPressed){
+                        Navigation.findNavController(requireView()).popBackStack()
+                    }
+                }else{
+                    loadInterAd(interAdKeyList[loadInterAdAttempt])
                 }
             }
 
@@ -177,8 +190,8 @@ class RingtoneSuccessFragment : Fragment() {
         })
     }
 
-    private fun loadAd(){
-        val builder = AdLoader.Builder(requireContext(), BuildConfig.AD_MOB_KEY)
+    private fun loadAd(key: String){
+        val builder = AdLoader.Builder(requireContext(), key)
             .forNativeAd { nativeAd ->
 
                 try {
@@ -192,9 +205,9 @@ class RingtoneSuccessFragment : Fragment() {
                         LayoutAdSuccessSavingBinding.inflate(
                             it
                         )
-                    }!!
-                    populateNativeAdView(nativeAd, adBinding)
-                    binding.adViewWallpaperSaved.addView(adBinding.root)
+                    }
+                    adBinding?.let { populateNativeAdView(nativeAd, it) }
+                    binding.adViewWallpaperSaved.addView(adBinding?.root)
                 }catch (e: Exception){
 
                 }
@@ -202,8 +215,13 @@ class RingtoneSuccessFragment : Fragment() {
             }
             .withAdListener(object : AdListener(){
                 override fun onAdFailedToLoad(p0: LoadAdError) {
-                    if (thanksPressed) showAdvertising()
-
+                    Log.i("RingtoneSuccessFragment", "failed to load native attempt $loadNativeAdAttempt")
+                    loadNativeAdAttempt++
+                    if (loadNativeAdAttempt > nativeAdKeyList.size - 1){
+                        if (thanksPressed) showAdvertising()
+                    }else{
+                        loadAd(nativeAdKeyList[loadNativeAdAttempt])
+                    }
                 }
             })
             .build()

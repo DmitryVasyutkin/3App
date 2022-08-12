@@ -15,6 +15,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import io.mobidoo.a3app.R
 import io.mobidoo.a3app.databinding.ActivityWallpaperBinding
+import io.mobidoo.a3app.utils.Constants
 
 class WallpaperActivity : AppCompatActivity() {
 
@@ -33,7 +34,7 @@ class WallpaperActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private var activityWasPaused = false
     var isLiveWall = false
-
+    private var loadInterAdAttempt = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityWallpaperBinding.inflate(layoutInflater)
@@ -46,13 +47,16 @@ class WallpaperActivity : AppCompatActivity() {
 
     }
 
-    private fun loadInterAd(){
+    private fun loadInterAd(key: String){
         val adRequest = AdRequest.Builder().build()
-        InterstitialAd.load(this, testInterAd, adRequest, object : InterstitialAdLoadCallback() {
+        InterstitialAd.load(this, key, adRequest, object : InterstitialAdLoadCallback() {
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 super.onAdFailedToLoad(p0)
-                Log.i("SplashScreen", "filed to load interstitial")
-
+                Log.i("SplashScreen", "filed to load interstitial attempt $loadInterAdAttempt")
+                loadInterAdAttempt++
+                if (loadInterAdAttempt <= Constants.interAdKeyList.size - 1){
+                    loadInterAd(Constants.interAdKeyList[loadInterAdAttempt])
+                }
             }
 
             override fun onAdLoaded(p0: InterstitialAd) {
@@ -94,14 +98,13 @@ class WallpaperActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
-        Log.d("MainActivity", "onPause")
         activityWasPaused = true
+        loadInterAdAttempt = 0
         super.onPause()
     }
 
     override fun onRestart() {
-        Log.d("MainActivity", "onRestart $activityWasPaused, $isLiveWall")
-        if(activityWasPaused && !isLiveWall) loadInterAd()
+        if(activityWasPaused && !isLiveWall) loadInterAd(Constants.interAdKeyList[loadInterAdAttempt])
         super.onRestart()
     }
 }

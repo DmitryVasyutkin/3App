@@ -26,6 +26,7 @@ import io.mobidoo.a3app.entity.startcollectionitem.WallpaperRecyclerItem
 import io.mobidoo.a3app.ui.MainActivity
 import io.mobidoo.a3app.ui.RingtoneCategoryItemsActivity
 import io.mobidoo.a3app.ui.startfragment.stop
+import io.mobidoo.a3app.utils.Constants.nativeAdKeyList
 import io.mobidoo.a3app.viewmodels.RingtonesViewModel
 import io.mobidoo.a3app.viewmodels.RingtonesViewModelFactory
 import io.mobidoo.domain.common.Constants
@@ -43,6 +44,9 @@ class RingtoneFragment : Fragment() {
     private lateinit var viewModel: RingtonesViewModel
 
     private lateinit var categoriesAdapter: RingtoneCategoriesAdapter
+
+    private var loadNativeAdAttempt = 0
+    private var adsCount = 0
 
     override fun onAttach(context: Context) {
         ((activity as MainActivity).application as Injector).createRingtoneSubComponent().inject(this)
@@ -68,7 +72,7 @@ class RingtoneFragment : Fragment() {
             val intent = RingtoneCategoryItemsActivity.getIntent(requireActivity(), link, name, ringtone, p)
             startActivity(intent)
         })
-
+        loadNativeAdAttempt = 0
         binding.rvRingtoneCategories.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = categoriesAdapter
@@ -79,16 +83,17 @@ class RingtoneFragment : Fragment() {
                 if (!it.isLoading){
                     binding.shimmerRingtoneCategories.stop()
                     val list = createList(it.categories)
-                    loadAds(list.size/Constants.AD_FREQUENCY_CATEGORIES)
+                    adsCount = list.size/Constants.AD_FREQUENCY_CATEGORIES
+                    loadAds(adsCount, nativeAdKeyList[loadNativeAdAttempt])
                     categoriesAdapter.setList(list)
                 }
             }
         }
         viewModel.getCategories()
     }
-    private fun loadAds(count: Int){
+    private fun loadAds(count: Int, key: String){
         Log.i("RingtoneCategory", "loadAds count $count")
-        val builder = AdLoader.Builder(requireContext(), BuildConfig.AD_MOB_KEY)
+        val builder = AdLoader.Builder(requireContext(), key)
             .forNativeAd { nativeAd ->
                 Log.i("RingtoneCategory", "native ad $nativeAd")
                 if(isDetached){
@@ -106,8 +111,11 @@ class RingtoneFragment : Fragment() {
                 }
 
                 override fun onAdFailedToLoad(p0: LoadAdError) {
-
-                    Log.i("RingtoneCategory", "nativeAd failed ${p0.message}")
+                    Log.i("RingtoneCategory", "nativeAd failed ${p0.message}, attempt $loadNativeAdAttempt")
+                    loadNativeAdAttempt++
+                    if (loadNativeAdAttempt <= nativeAdKeyList.size - 1){
+                        loadAds(adsCount, nativeAdKeyList[loadNativeAdAttempt])
+                    }
                 }
             })
             .build()

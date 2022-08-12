@@ -35,6 +35,7 @@ import io.mobidoo.a3app.entity.uistate.allcollectionstate.AllCollectionsUIState
 import io.mobidoo.a3app.ui.*
 import io.mobidoo.a3app.utils.AppUtils.expand
 import io.mobidoo.a3app.utils.AppUtils.getWallpaperTypeFromLink
+import io.mobidoo.a3app.utils.Constants.nativeAdKeyList
 import io.mobidoo.a3app.viewmodels.MainActivityViewModel
 import io.mobidoo.a3app.viewmodels.MainActivityViewModelFactory
 import io.mobidoo.domain.common.Constants.WALLS_HEIGHT_TO_WIDTH_DIMENSION
@@ -81,6 +82,8 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
     private var selectedFlashCallUrl: String? = null
 
     private var fragmentWasPaused = false
+    private var loadNativeAdAttempt = 0
+    private var loadInterAdAttempt = 0
 
     override fun onAttach(context: Context) {
         (activity?.application as Injector).createWallpaperSubComponent().inject(this)
@@ -104,14 +107,8 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        val request = RequestConfiguration.Builder().setTestDeviceIds(Arrays.asList("34A6AF4C95E8EC517667A12EF589AB8B")).build()
-//        MobileAds.setRequestConfiguration(request)
-//        MobileAds.initialize(requireContext(), object: OnInitializationCompleteListener {
-//            override fun onInitializationComplete(p0: InitializationStatus) {
-//                loadAds()
-//            }
-//        })
-        loadAds()
+        loadNativeAdAttempt = 0
+        loadAds(nativeAdKeyList[loadNativeAdAttempt])
 //        loadInterAd()
         initializeRecyclers()
         binding.btnSeeAllLive.setOnClickListener(this)
@@ -157,11 +154,11 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
 
 
 
-    private fun loadAds(){
+    private fun loadAds(key: String){
         nativeAds.forEach {
             it.destroy()
         }
-        val builder = AdLoader.Builder(requireContext(), BuildConfig.AD_MOB_KEY)
+        val builder = AdLoader.Builder(requireContext(), key)
             .forNativeAd { nativeAd ->
 
                 if(isDetached){
@@ -174,14 +171,16 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
                     LayoutAdCollectionsBinding.inflate(
                         it
                     )
-                }!!
-                populateNativeAdView(nativeAd, adBinding)
+                }
+                if (adBinding != null) {
+                    populateNativeAdView(nativeAd, adBinding)
+                }
                 if(nativeAds.size == 1){
                     adViewLayout1.removeAllViews()
-                    adViewLayout1.addView(adBinding.root)
+                    adViewLayout1.addView(adBinding?.root)
                 }else if(nativeAds.size == 2){
                     adViewLayout2.removeAllViews()
-                    adViewLayout2.addView(adBinding.root)
+                    adViewLayout2.addView(adBinding?.root)
                 }
 
             }
@@ -194,7 +193,11 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
 
                 override fun onAdFailedToLoad(p0: LoadAdError) {
 
-                    Log.i("StartCollections", "nativeAd failed ${p0.message}")
+                    Log.i("StartCollections", "nativeAd failed ${p0.message}, attempt $loadNativeAdAttempt")
+                    loadNativeAdAttempt++
+                    if (loadNativeAdAttempt <= nativeAdKeyList.size - 1){
+                        loadAds(nativeAdKeyList[loadNativeAdAttempt])
+                    }
                 }
             })
             .build()
@@ -207,11 +210,9 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
 
         it.live?.startArray?.let { it1 ->
             liveWallsAdapter.setList(it1)
-            Log.i(TAG, "liveList $it1")
         }
         it.flashCall?.startArray?.let { it1 ->
             flashCallAdapter.setList(it1)
-            Log.i(TAG, "flashList $it1")
         }
         it.new?.startArray?.let { it1 -> newWallsAdapter.setList(it1) }
         it.all?.startArray?.let { it1 -> allWallsAdapter.setList(it1) }
@@ -221,14 +222,6 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
 
     }
     private fun handleIemClick(item: Wallpaper){
-//        selectedWallpaperItem = item
-//        if (interstitialLoaded && mInterstitialAd != null){
-//            interIsShowing = true
-//            mInterstitialAd?.show(requireActivity())
-//        }else if(interstitialLoaded && mInterstitialAd == null){
-//            startActivity(
-//                WallpaperActivity.getIntent(requireActivity(), item.url, resources.getString(R.string.common_folder), getWallpaperTypeFromLink(item.url)))
-//        }
         startActivity(
             WallpaperActivity.getIntent(requireActivity(), item.url, resources.getString(R.string.common_folder), getWallpaperTypeFromLink(item.url)))
 

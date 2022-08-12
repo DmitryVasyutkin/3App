@@ -30,10 +30,11 @@ import io.mobidoo.a3app.databinding.LayoutGreetingBinding
 import io.mobidoo.a3app.di.Injector
 import io.mobidoo.a3app.utils.AppUtils.expand
 import io.mobidoo.a3app.utils.Constants
+import io.mobidoo.a3app.utils.Constants.interAdKeyList
+import io.mobidoo.a3app.utils.Constants.nativeAdKeyList
 import java.util.*
 import javax.inject.Inject
 
-const val testInterAd = "ca-app-pub-3940256099942544/1033173712"
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
 
@@ -50,6 +51,9 @@ class SplashActivity : AppCompatActivity() {
     private var closeButtonPressed = false
     @Inject
     lateinit var sharedPreferences: SharedPreferences
+
+    private var loadNativeAdAttempt = 0
+    private var loadInterAdAttempt = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         (application as Injector).createWallpaperSubComponent().inject(this)
@@ -98,8 +102,10 @@ class SplashActivity : AppCompatActivity() {
         MobileAds.initialize(this, object: OnInitializationCompleteListener{
             override fun onInitializationComplete(p0: InitializationStatus) {
              //   bottomSheetBehavior.expand()
-                loadAd()
-                loadInterAd()
+                loadNativeAdAttempt = 0
+                loadInterAdAttempt - 0
+                loadAd(nativeAdKeyList[loadNativeAdAttempt])
+                loadInterAd(interAdKeyList[loadInterAdAttempt])
             }
         })
     }
@@ -117,51 +123,50 @@ class SplashActivity : AppCompatActivity() {
         handler?.postDelayed({ openSecondScreen() }, 500)
     }
 
-    private fun loadInterAd(){
+    private fun loadInterAd(key: String){
         val adRequest = AdRequest.Builder().build()
-        InterstitialAd.load(this, testInterAd, adRequest, object : InterstitialAdLoadCallback() {
+        InterstitialAd.load(this, key, adRequest, object : InterstitialAdLoadCallback() {
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 super.onAdFailedToLoad(p0)
-                Log.i("SplashScreen", "filed to load interstitial")
-                mInterstitialAd = null
-                interstitialLoaded = true
-                if (closeButtonPressed){
-                    openMainActivity()
+                Log.i("SplashScreen", "filed to load interstitial attempt $loadInterAdAttempt")
+                loadInterAdAttempt++
+                if(loadInterAdAttempt > interAdKeyList.size - 1){
+                    mInterstitialAd = null
+                    interstitialLoaded = true
+                    if (closeButtonPressed){
+                        openMainActivity()
+                    }
+                }else{
+                    loadInterAd(interAdKeyList[loadInterAdAttempt])
                 }
-               // openMainActivity()
+
             }
 
             override fun onAdLoaded(p0: InterstitialAd) {
-                Log.i("SplashScreen", "interstitial loaded $p0")
                 super.onAdLoaded(p0)
                 mInterstitialAd = p0
                 mInterstitialAd?.fullScreenContentCallback = object: FullScreenContentCallback() {
                     override fun onAdClicked() {
                         // Called when a click is recorded for an ad.
-                        Log.d("SplashScreen", "Ad was clicked.")
                     }
 
                     override fun onAdDismissedFullScreenContent() {
                         // Called when ad is dismissed.
-                        Log.d("SplashScreen", "Ad dismissed fullscreen content.")
                         mInterstitialAd = null
                         openMainActivity()
                     }
 
                     override fun onAdFailedToShowFullScreenContent(p0: AdError) {
                         super.onAdFailedToShowFullScreenContent(p0)
-                        Log.d("SplashScreen", "Ad failed to show fullscreen content.")
                         mInterstitialAd = null
                     }
 
                     override fun onAdImpression() {
                         // Called when an impression is recorded for an ad.
-                        Log.d("SplashScreen", "Ad recorded an impression.")
                     }
 
                     override fun onAdShowedFullScreenContent() {
                         // Called when ad is shown.
-                        Log.d("SplashScreen", "Ad showed fullscreen content.")
                     }
 
                 }
@@ -173,8 +178,8 @@ class SplashActivity : AppCompatActivity() {
         })
     }
 
-    private fun loadAd(){
-        val builder = AdLoader.Builder(this, BuildConfig.AD_MOB_KEY)
+    private fun loadAd(key : String){
+        val builder = AdLoader.Builder(this, key)
             .forNativeAd { nativeAd ->
 
 
@@ -194,18 +199,21 @@ class SplashActivity : AppCompatActivity() {
                 override fun onAdLoaded() {
                     super.onAdLoaded()
                     bottomSheetBehavior.expand()
-                    Log.i("SplashScreen", "onAdLoaded")
                 }
 
                 override fun onAdFailedToLoad(p0: LoadAdError) {
-                    bottomSheetBehavior.expand()
-                    Log.i("SplashScreen", "nativeAd failed ${p0.message}")
+                    Log.i("SplashScreen", "failed to load native attempt $loadNativeAdAttempt")
+                    loadNativeAdAttempt++
+                    if(loadNativeAdAttempt > nativeAdKeyList.size - 1){
+                        bottomSheetBehavior.expand()
+                    }else{
+                        loadAd(nativeAdKeyList[loadNativeAdAttempt])
+                    }
                 }
             })
             .build()
         val request = AdRequest.Builder()
             .build()
-        Log.i("SplashScreen", "is Test device ${request.isTestDevice(this)}")
         builder.loadAd(request)
     }
 
@@ -215,10 +223,6 @@ class SplashActivity : AppCompatActivity() {
         nativeAdView.bodyView = adViewBinding.adHeadlineSplash
         nativeAdView.imageView = adViewBinding.adAppIconSplash
         nativeAdView.callToActionView = adViewBinding.btnNativeAdActionSplash
-//        Log.i("SplashScreen", "advertiser ${nativeAd.advertiser}")
-//        Log.i("SplashScreen", "store ${nativeAd.store}")
-//        Log.i("SplashScreen", "extras ${nativeAd.extras}")
-//        Log.i("SplashScreen", "callToAction ${nativeAd.callToAction}")
         if (nativeAd.body != null){
             adViewBinding.adHeadlineSplash.text = nativeAd.body
         }else if (nativeAd.headline != null){

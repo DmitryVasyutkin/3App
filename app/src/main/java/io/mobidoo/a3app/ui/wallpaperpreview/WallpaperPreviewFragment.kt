@@ -46,13 +46,16 @@ import io.mobidoo.a3app.databinding.LayoutAdCollectionsBinding
 import io.mobidoo.a3app.databinding.LayoutAdWallPreviewBinding
 import io.mobidoo.a3app.services.LiveWallpaperService
 import io.mobidoo.a3app.ui.WallpaperActivity
-import io.mobidoo.a3app.ui.testInterAd
+
 import io.mobidoo.a3app.utils.AppUtils
 import io.mobidoo.a3app.utils.AppUtils.createFullLink
 import io.mobidoo.a3app.utils.AppUtils.isServiceRunning
 import io.mobidoo.a3app.utils.AppUtils.startWallpaperService
 import io.mobidoo.a3app.utils.AppUtils.toDayOfWeek
 import io.mobidoo.a3app.utils.AppUtils.toMonth
+import io.mobidoo.a3app.utils.Constants
+import io.mobidoo.a3app.utils.Constants.interAdKeyList
+import io.mobidoo.a3app.utils.Constants.nativeAdKeyList
 import io.mobidoo.a3app.utils.FileDownloaderListener
 import io.mobidoo.a3app.utils.MediaLoadManager
 import kotlinx.coroutines.Dispatchers
@@ -99,7 +102,8 @@ class WallpaperPreviewFragment : Fragment() {
 
     private var handler: Handler? = null
     private val  liveWallStateLiveData: MutableLiveData<Boolean> = MutableLiveData(false)
-
+    private var loadNativeAdAttempt = 0
+    private var loadInterAdAttempt = 0
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -114,8 +118,10 @@ class WallpaperPreviewFragment : Fragment() {
         link = requireActivity().intent?.extras?.getString(WallpaperActivity.EXTRA_WALLPAPER_LINK).toString()
         categoryName = requireActivity().intent?.extras?.getString(WallpaperActivity.EXTRA_CATEGORY_NAME).toString()
         wallpaperType = requireActivity().intent?.extras?.getInt(WallpaperActivity.EXTRA_WALLPAPER_TYPE)!!
-        loadInterAd()
-
+        loadInterAdAttempt = 0
+        loadNativeAdAttempt = 0
+        loadInterAd(interAdKeyList[loadInterAdAttempt])
+        loadAd(nativeAdKeyList[loadNativeAdAttempt])
         if (wallpaperType == TYPE_STATIC){
             binding.ivWallpaperAction.visibility = View.VISIBLE
             binding.videoViewWallpaperAction.visibility = View.GONE
@@ -139,7 +145,7 @@ class WallpaperPreviewFragment : Fragment() {
             activity?.onBackPressed()
         }
         binding.ibShareWallpaper.setOnClickListener {
-            val link = "market://details?id=" + resources.getString(R.string.app_name)
+            val link = Constants.shareLink
             val intent = Intent(Intent.ACTION_SEND).apply {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, link)
@@ -186,7 +192,7 @@ class WallpaperPreviewFragment : Fragment() {
                 handler!!)
         }
         setInsets(view)
-        loadAd()
+
         liveWallStateLiveData.observe(viewLifecycleOwner){
             if (it){
                 if (wallpaperType != TYPE_STATIC && !congratsShowed){
@@ -372,19 +378,25 @@ class WallpaperPreviewFragment : Fragment() {
     }
 
 
-    private fun loadInterAd(){
+    private fun loadInterAd(key: String){
         val adRequest = AdRequest.Builder().build()
-        InterstitialAd.load(requireContext(), testInterAd, adRequest, object : InterstitialAdLoadCallback() {
+        InterstitialAd.load(requireContext(), key, adRequest, object : InterstitialAdLoadCallback() {
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 super.onAdFailedToLoad(p0)
-                Log.i("SplashScreen", "filed to load interstitial")
-                mInterstitialAd = null
-                interstitialLoaded = true
-                if(onBackPressed){
-                   activity?.finish()
+                Log.i("SplashScreen", "filed to load interstitial attempt $loadInterAdAttempt")
+                loadInterAdAttempt++
+                if (loadInterAdAttempt > interAdKeyList.size - 1){
+                    mInterstitialAd = null
+                    interstitialLoaded = true
+                    if(onBackPressed){
+                        activity?.finish()
+                    }else{
+                        binding.rlInterAdPlaceholder.visibility = View.GONE
+                    }
                 }else{
-                    binding.rlInterAdPlaceholder.visibility = View.GONE
+                    loadInterAd(interAdKeyList[loadInterAdAttempt])
                 }
+
             }
 
             override fun onAdLoaded(p0: InterstitialAd) {
@@ -432,8 +444,8 @@ class WallpaperPreviewFragment : Fragment() {
         })
     }
 
-    private fun loadAd(){
-        val builder = AdLoader.Builder(requireContext(), BuildConfig.AD_MOB_KEY)
+    private fun loadAd(key: String){
+        val builder = AdLoader.Builder(requireContext(), key)
             .forNativeAd { nativeAd ->
                 currentAd = nativeAd
                 if(isDetached){
@@ -441,20 +453,25 @@ class WallpaperPreviewFragment : Fragment() {
                     return@forNativeAd
                 }
                 showAdvertising()
-                val adBinding = LayoutAdWallPreviewBinding.inflate(activity?.layoutInflater!!)
-                populateNativeAdView(nativeAd, adBinding)
+                val adBinding = activity?.layoutInflater?.let {
+                    LayoutAdWallPreviewBinding.inflate(
+                        it
+                    )
+                }
+                if (adBinding != null) {
+                    populateNativeAdView(nativeAd, adBinding)
+                }
                 binding.flWallAdvertising.removeAllViews()
-                binding.flWallAdvertising.addView(adBinding.root)
+                binding.flWallAdvertising.addView(adBinding?.root)
             }
             .withAdListener(object : AdListener(){
-                override fun onAdLoaded() {
-                    super.onAdLoaded()
-
-                    Log.i("WallpaperActionFragment", "onAdLoaded")
-                }
 
                 override fun onAdFailedToLoad(p0: LoadAdError) {
-                    Log.i("WallpaperActionFragment", "nativeAd failed ${p0.message}")
+                    Log.i("WallpaperActionFragment", "nativeAd failed ${p0.message}, attempt $loadNativeAdAttempt")
+                    loadNativeAdAttempt++
+                    if (loadNativeAdAttempt <= nativeAdKeyList.size - 1){
+                        loadAd(nativeAdKeyList[loadNativeAdAttempt])
+                    }
                 }
             })
             .build()

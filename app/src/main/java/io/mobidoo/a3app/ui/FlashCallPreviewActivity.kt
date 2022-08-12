@@ -16,6 +16,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import io.mobidoo.a3app.R
 import io.mobidoo.a3app.databinding.ActivityFlashCallPreviewBinding
 import io.mobidoo.a3app.databinding.ActivityWallpaperBinding
+import io.mobidoo.a3app.utils.Constants.interAdKeyList
 
 class FlashCallPreviewActivity : AppCompatActivity() {
 
@@ -30,6 +31,9 @@ class FlashCallPreviewActivity : AppCompatActivity() {
     private lateinit var binding: ActivityFlashCallPreviewBinding
     private lateinit var navController: NavController
     private var activityWasPaused = false
+
+    private var loadInterAdAttempt = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityFlashCallPreviewBinding.inflate(layoutInflater)
@@ -39,12 +43,16 @@ class FlashCallPreviewActivity : AppCompatActivity() {
         navController = navHostFragment.navController
     }
 
-    private fun loadInterAd(){
+    private fun loadInterAd(key: String){
         val adRequest = AdRequest.Builder().build()
-        InterstitialAd.load(this, testInterAd, adRequest, object : InterstitialAdLoadCallback() {
+        InterstitialAd.load(this, key, adRequest, object : InterstitialAdLoadCallback() {
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 super.onAdFailedToLoad(p0)
-                Log.i("SplashScreen", "filed to load interstitial")
+                Log.i("SplashScreen", "filed to load interstitial attempt $loadInterAdAttempt")
+                loadInterAdAttempt++
+                if (loadInterAdAttempt <= interAdKeyList.size - 1){
+                    loadInterAd(interAdKeyList[loadInterAdAttempt])
+                }
 
             }
 
@@ -89,11 +97,12 @@ class FlashCallPreviewActivity : AppCompatActivity() {
     override fun onPause() {
         Log.d("MainActivity", "onPause")
         activityWasPaused = true
+        loadInterAdAttempt = 0
         super.onPause()
     }
     override fun onRestart() {
         Log.d("MainActivity", "onRestart")
-        if(activityWasPaused) loadInterAd()
+        if(activityWasPaused) loadInterAd(interAdKeyList[loadInterAdAttempt])
         super.onRestart()
     }
 }

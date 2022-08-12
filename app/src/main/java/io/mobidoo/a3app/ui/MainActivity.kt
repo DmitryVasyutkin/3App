@@ -21,33 +21,33 @@ import com.google.android.material.navigation.NavigationBarView
 import io.mobidoo.a3app.R
 import io.mobidoo.a3app.databinding.ActivityMainBinding
 import io.mobidoo.a3app.di.Injector
+import io.mobidoo.a3app.utils.Constants.interAdKeyList
 import io.mobidoo.a3app.viewmodels.MainActivityViewModel
 import io.mobidoo.a3app.viewmodels.MainActivityViewModelFactory
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
- //   private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private var navHostFragment: NavHostFragment? = null
 
     private lateinit var bottomNavView: BottomNavigationView
     private var activityWasPaused = false
 
+    private var loadInterAdAttempt = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-     //   binding = ActivityMainBinding.inflate(layoutInflater)
-        Log.i("MainActivityTimes", "before setcontent")
         setContentView(R.layout.activity_main)
-        Log.i("MainActivityTimes", "after setcontent")
+
         bottomNavView = findViewById(R.id.bottomNavView)
         bottomNavView.itemIconTintList = null
         navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container) as NavHostFragment
-        Log.i("MainActivityTimes", "after findFragmentById")
+
         navController = navHostFragment?.navController!!
-        Log.i("MainActivityTimes", "after navHostFragment?.navController!!")
+
         NavigationUI.setupWithNavController(bottomNavView, navController)
-        Log.i("MainActivityTimes", "after setupWithNavController")
+
     }
 
     fun navigateToFlashCalls(){
@@ -57,13 +57,16 @@ class MainActivity : AppCompatActivity() {
     fun navigateToLiveWalls(){
         bottomNavView.selectedItemId = R.id.live
     }
-    private fun loadInterAd(){
+    private fun loadInterAd(key: String){
         val adRequest = AdRequest.Builder().build()
-        InterstitialAd.load(this, testInterAd, adRequest, object : InterstitialAdLoadCallback() {
+        InterstitialAd.load(this, key, adRequest, object : InterstitialAdLoadCallback() {
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 super.onAdFailedToLoad(p0)
-                Log.i("SplashScreen", "filed to load interstitial")
-
+                Log.i("SplashScreen", "filed to load interstitial attempt $loadInterAdAttempt")
+                loadInterAdAttempt++
+                if (loadInterAdAttempt <= interAdKeyList.size - 1){
+                    loadInterAd(interAdKeyList[loadInterAdAttempt])
+                }
             }
 
             override fun onAdLoaded(p0: InterstitialAd) {
@@ -106,6 +109,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         Log.d("MainActivity", "onPause")
+        loadInterAdAttempt = 0
         activityWasPaused = true
         super.onPause()
     }
@@ -126,7 +130,7 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onRestart() {
         Log.d("MainActivity", "onRestart")
-        if(activityWasPaused) loadInterAd()
+        if(activityWasPaused) loadInterAd(interAdKeyList[loadInterAdAttempt])
         super.onRestart()
     }
 }

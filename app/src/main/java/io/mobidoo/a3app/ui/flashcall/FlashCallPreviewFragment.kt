@@ -55,12 +55,12 @@ import io.mobidoo.a3app.ui.FlashCallPreviewActivity
 import io.mobidoo.a3app.ui.MainActivity
 import io.mobidoo.a3app.ui.bottomsheet.AllowChangeSettingsPermissions
 import io.mobidoo.a3app.ui.ringtone.RingtoneCategoryItemsFragment
-import io.mobidoo.a3app.ui.testInterAd
 import io.mobidoo.a3app.ui.wallpaperpreview.WallpaperPreviewSuccessFragment
 import io.mobidoo.a3app.utils.*
 import io.mobidoo.a3app.utils.AppUtils.createFullLink
 import io.mobidoo.a3app.utils.Constants.APP_PREFS
 import io.mobidoo.a3app.utils.Constants.SP_FLASH_CAL_URI
+import io.mobidoo.a3app.utils.Constants.interAdKeyList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -111,6 +111,8 @@ class FlashCallPreviewFragment : Fragment() {
     @Inject
     lateinit var sharedPreferences: SharedPreferences
 
+    private var loadInterAdAttempt = 0
+
     override fun onAttach(context: Context) {
         (activity?.application as Injector).createWallpaperSubComponent().inject(this)
         super.onAttach(context)
@@ -130,8 +132,8 @@ class FlashCallPreviewFragment : Fragment() {
         link = requireActivity().intent?.extras?.getString(FlashCallPreviewActivity.EXTRA_WALLPAPER_LINK).toString()
         categoryName = requireActivity().intent?.extras?.getString(FlashCallPreviewActivity.EXTRA_CATEGORY_NAME).toString()
 
-
-        loadInterAd()
+        loadInterAdAttempt = 0
+        loadInterAd(interAdKeyList[loadInterAdAttempt])
         downloadManager = MediaLoadManager(requireContext().contentResolver, resources,
             object : FileDownloaderListener {
                 override suspend fun success(path: String) {
@@ -166,9 +168,14 @@ class FlashCallPreviewFragment : Fragment() {
                 requestPermissionLauncher.launch(notAllowed.toTypedArray())
             }
         }
-//        if(flashCallLoaded){
-//            startActivity(Intent(ACTION_SHOW_CALL_SETTINGS))
-//        }
+        binding.ibShareFlashPreview.setOnClickListener {
+            val link = Constants.shareLink
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, link)
+            }
+            startActivity(Intent.createChooser(intent, resources.getString(R.string.shareLink)))
+        }
         requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){ isGranted ->
             Log.i(TAG, "isGraned Map $isGranted")
             if (!isGranted.containsValue(false)){
@@ -209,14 +216,6 @@ class FlashCallPreviewFragment : Fragment() {
                 }
             }
         }
-//        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,object : OnBackPressedCallback(true) {
-//            override fun handleOnBackPressed() {
-////                binding.rlInterAdPlaceholderFlashCall.visibility = View.VISIBLE
-////                loadInterAd()
-////                onBackPressed = true
-//            }
-//        }
-//        )
         requestPermissionLauncher3 = registerForActivityResult(ActivityResultContracts.RequestPermission()){isGranted ->
             if(isGranted){
                 Log.i("FlashCallPreview", "isGranted $isGranted")
@@ -229,15 +228,7 @@ class FlashCallPreviewFragment : Fragment() {
                             Uri.parse("package:" + requireContext().packageName)
                         ), 4556
                     )
-//                    val fr = AllowChangeSettingsPermissions(){
-//                        startActivityForResult(
-//                            Intent(
-//                                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-//                                Uri.parse("package:" + requireContext().packageName)
-//                            ), 4556
-//                        )
-//                    }
-//                    fr.show(activity?.supportFragmentManager?.beginTransaction()!!, "allow_permissions")
+
                 }
             }
         }
@@ -328,21 +319,25 @@ class FlashCallPreviewFragment : Fragment() {
         }
 
     }
-    private fun loadInterAd(){
+    private fun loadInterAd(key: String){
         val adRequest = AdRequest.Builder().build()
-        InterstitialAd.load(requireContext(), testInterAd, adRequest, object : InterstitialAdLoadCallback() {
+        InterstitialAd.load(requireContext(), key, adRequest, object : InterstitialAdLoadCallback() {
             override fun onAdFailedToLoad(p0: LoadAdError) {
                 super.onAdFailedToLoad(p0)
-                Log.i("SplashScreen", "filed to load interstitial")
-                mInterstitialAd = null
-                interstitialLoaded = true
-                if(onBackPressed){
-                    activity?.finish()
+                Log.i("SplashScreen", "filed to load interstitial attempt $loadInterAdAttempt")
+                loadInterAdAttempt++
+                if (loadInterAdAttempt > interAdKeyList.size - 1){
+                    mInterstitialAd = null
+                    interstitialLoaded = true
+                    if(onBackPressed){
+                        activity?.finish()
+                    }else{
+                        binding.rlInterAdPlaceholderFlashCall.visibility = View.GONE
+                        initializePlayer()
+                    }
                 }else{
-                    binding.rlInterAdPlaceholderFlashCall.visibility = View.GONE
-                    initializePlayer()
+                    loadInterAd(interAdKeyList[loadInterAdAttempt])
                 }
-
             }
 
             override fun onAdLoaded(p0: InterstitialAd) {

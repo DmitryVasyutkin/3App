@@ -485,21 +485,6 @@ class MediaLoadManager(
         return result
     }
 
-    suspend fun extractAudio(context: Context, videoUri: String, action: (String) -> Unit){
-        val destPath = ringFile(context).path
-        try{
-
-            val videoFd = contentResolver.openFileDescriptor(Uri.parse(videoUri), "w")?.fileDescriptor
-            AudioUtils().genVideoUsingMuxer(videoFd, destPath, -1, -1, true, false)
-        }catch (e: Exception){
-            Log.e("MediaLoaderManager", "exc $e")
-        }finally {
-            withContext(Dispatchers.Main){
-                destPath.let { action(it) }
-            }
-
-        }
-    }
     private fun outputDir(context: Context) : File {
 
         val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
