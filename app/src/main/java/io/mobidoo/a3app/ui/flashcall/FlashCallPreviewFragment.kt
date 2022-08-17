@@ -336,7 +336,11 @@ class FlashCallPreviewFragment : Fragment() {
                         initializePlayer()
                     }
                 }else{
-                    loadInterAd(interAdKeyList[loadInterAdAttempt])
+                    try {
+                        loadInterAd(interAdKeyList[loadInterAdAttempt])
+                    }catch (e: Exception){
+
+                    }
                 }
             }
 

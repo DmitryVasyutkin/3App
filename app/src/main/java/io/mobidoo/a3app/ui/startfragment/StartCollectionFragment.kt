@@ -196,7 +196,11 @@ class StartCollectionFragment : Fragment(), View.OnClickListener {
                     Log.i("StartCollections", "nativeAd failed ${p0.message}, attempt $loadNativeAdAttempt")
                     loadNativeAdAttempt++
                     if (loadNativeAdAttempt <= nativeAdKeyList.size - 1){
-                        loadAds(nativeAdKeyList[loadNativeAdAttempt])
+                        try {
+                            loadAds(nativeAdKeyList[loadNativeAdAttempt])
+                        }catch (e: Exception){
+
+                        }
                     }
                 }
             })

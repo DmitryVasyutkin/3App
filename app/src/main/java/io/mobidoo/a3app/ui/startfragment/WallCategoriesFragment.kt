@@ -118,7 +118,11 @@ class WallCategoriesFragment : Fragment() {
                     Log.i("WallpaperCategory", "nativeAd failed ${p0.message}, attempt $loadNativeAdAttempt")
                     loadNativeAdAttempt++
                     if (loadNativeAdAttempt <= nativeAdKeyList.size - 1){
-                        loadAds(nativeAdsCount, nativeAdKeyList[loadNativeAdAttempt])
+                        try {
+                            loadAds(nativeAdsCount, nativeAdKeyList[loadNativeAdAttempt])
+                        }catch (e: Exception){
+
+                        }
                     }
                 }
             })

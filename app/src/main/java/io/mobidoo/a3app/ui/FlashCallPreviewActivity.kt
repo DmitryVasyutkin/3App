@@ -51,7 +51,11 @@ class FlashCallPreviewActivity : AppCompatActivity() {
                 Log.i("SplashScreen", "filed to load interstitial attempt $loadInterAdAttempt")
                 loadInterAdAttempt++
                 if (loadInterAdAttempt <= interAdKeyList.size - 1){
-                    loadInterAd(interAdKeyList[loadInterAdAttempt])
+                    try {
+                        loadInterAd(interAdKeyList[loadInterAdAttempt])
+                    }catch (e: Exception){
+
+                    }
                 }
 
             }
@@ -102,6 +106,7 @@ class FlashCallPreviewActivity : AppCompatActivity() {
     }
     override fun onRestart() {
         Log.d("MainActivity", "onRestart")
+        loadInterAdAttempt = 0
         if(activityWasPaused) loadInterAd(interAdKeyList[loadInterAdAttempt])
         super.onRestart()
     }

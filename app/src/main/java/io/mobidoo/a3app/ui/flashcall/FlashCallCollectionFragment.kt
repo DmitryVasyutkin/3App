@@ -110,7 +110,11 @@ class FlashCallCollectionFragment : Fragment() {
                     Log.i("FlashCall", "nativeAd failed ${p0.message}, attempt $loadNativeAdAttempt")
                     loadNativeAdAttempt++
                     if(loadNativeAdAttempt <= nativeAdKeyList.size - 1){
-                        loadAds(adsCount, nativeAdKeyList[loadNativeAdAttempt])
+                        try {
+                            loadAds(adsCount, nativeAdKeyList[loadNativeAdAttempt])
+                        }catch (e: Exception){
+
+                        }
                     }
                 }
             })

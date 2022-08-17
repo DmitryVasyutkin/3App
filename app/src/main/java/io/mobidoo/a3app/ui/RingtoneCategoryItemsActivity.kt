@@ -58,7 +58,11 @@ class RingtoneCategoryItemsActivity : AppCompatActivity() {
                 Log.i("SplashScreen", "filed to load interstitial attempt $loadInterAdAttempt")
                 loadInterAdAttempt++
                 if (loadInterAdAttempt <= Constants.interAdKeyList.size - 1){
-                    loadInterAd(Constants.interAdKeyList[loadInterAdAttempt])
+                    try {
+                        loadInterAd(Constants.interAdKeyList[loadInterAdAttempt])
+                    }catch (e: Exception){
+
+                    }
                 }
             }
 
@@ -108,6 +112,7 @@ class RingtoneCategoryItemsActivity : AppCompatActivity() {
     }
     override fun onRestart() {
         Log.d("MainActivity", "onRestart")
+        loadInterAdAttempt = 0
         if(activityWasPaused) loadInterAd(Constants.interAdKeyList[loadInterAdAttempt])
         super.onRestart()
     }

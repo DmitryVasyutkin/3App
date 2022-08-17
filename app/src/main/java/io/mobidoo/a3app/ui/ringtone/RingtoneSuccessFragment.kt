@@ -143,7 +143,11 @@ class RingtoneSuccessFragment : Fragment() {
                         Navigation.findNavController(requireView()).popBackStack()
                     }
                 }else{
-                    loadInterAd(interAdKeyList[loadInterAdAttempt])
+                    try {
+                        loadInterAd(interAdKeyList[loadInterAdAttempt])
+                    }catch (e: Exception){
+
+                    }
                 }
             }
 
@@ -220,7 +224,11 @@ class RingtoneSuccessFragment : Fragment() {
                     if (loadNativeAdAttempt > nativeAdKeyList.size - 1){
                         if (thanksPressed) showAdvertising()
                     }else{
-                        loadAd(nativeAdKeyList[loadNativeAdAttempt])
+                        try {
+                            loadAd(nativeAdKeyList[loadNativeAdAttempt])
+                        }catch (e: Exception){
+
+                        }
                     }
                 }
             })

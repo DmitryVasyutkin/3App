@@ -78,7 +78,11 @@ class SettingsMainFragment : Fragment(), View.OnClickListener {
                     Log.i("SettingsFragment", "failed to load native ad attempt $loadNativeAdAttempt")
                     loadNativeAdAttempt++
                     if (loadNativeAdAttempt <= nativeAdKeyList.size - 1){
-                        loadAd(nativeAdKeyList[loadNativeAdAttempt])
+                        try {
+                            loadAd(nativeAdKeyList[loadNativeAdAttempt])
+                        }catch (e: Exception){
+
+                        }
                     }
                 }
             })

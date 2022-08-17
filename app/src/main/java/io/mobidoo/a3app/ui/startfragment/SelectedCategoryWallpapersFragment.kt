@@ -136,7 +136,14 @@ class SelectedCategoryWallpapersFragment : Fragment(){
                     Log.i("SelectedCategory", "nativeAd failed ${p0.message}, attempt $loadNativeAdAttempt")
                     loadNativeAdAttempt++
                     if (loadNativeAdAttempt <= io.mobidoo.a3app.utils.Constants.nativeAdKeyList.size - 1){
-                        loadAds(nativeAdsCount, io.mobidoo.a3app.utils.Constants.nativeAdKeyList[loadNativeAdAttempt])
+                        try {
+                            loadAds(
+                                nativeAdsCount,
+                                io.mobidoo.a3app.utils.Constants.nativeAdKeyList[loadNativeAdAttempt]
+                            )
+                        }catch (e: Exception){
+
+                        }
                     }
                 }
             })

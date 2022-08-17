@@ -377,7 +377,6 @@ class WallpaperPreviewFragment : Fragment() {
         }
     }
 
-
     private fun loadInterAd(key: String){
         val adRequest = AdRequest.Builder().build()
         InterstitialAd.load(requireContext(), key, adRequest, object : InterstitialAdLoadCallback() {
@@ -394,9 +393,12 @@ class WallpaperPreviewFragment : Fragment() {
                         binding.rlInterAdPlaceholder.visibility = View.GONE
                     }
                 }else{
-                    loadInterAd(interAdKeyList[loadInterAdAttempt])
-                }
+                    try {
+                        loadInterAd(interAdKeyList[loadInterAdAttempt])
+                    }catch (e: Exception){
 
+                    }
+                }
             }
 
             override fun onAdLoaded(p0: InterstitialAd) {
@@ -470,7 +472,11 @@ class WallpaperPreviewFragment : Fragment() {
                     Log.i("WallpaperActionFragment", "nativeAd failed ${p0.message}, attempt $loadNativeAdAttempt")
                     loadNativeAdAttempt++
                     if (loadNativeAdAttempt <= nativeAdKeyList.size - 1){
-                        loadAd(nativeAdKeyList[loadNativeAdAttempt])
+                        try {
+                            loadAd(nativeAdKeyList[loadNativeAdAttempt])
+                        }catch (e: Exception){
+
+                        }
                     }
                 }
             })

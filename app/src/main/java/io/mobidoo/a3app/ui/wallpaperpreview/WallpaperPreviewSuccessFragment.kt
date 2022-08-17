@@ -158,7 +158,11 @@ class WallpaperPreviewSuccessFragment : Fragment() {
                         nativeAdLoaded = true
                         if (thanksPressed) showAdvertising()
                     }else{
-                        loadAd(nativeAdKeyList[loadNativeAdAttempt])
+                        try {
+                            loadAd(nativeAdKeyList[loadNativeAdAttempt])
+                        }catch (e: Exception){
+
+                        }
                     }
                 }
             })
